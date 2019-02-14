@@ -6,7 +6,7 @@ exports.command = 'contents [--token=<token>] <file> <search>'
 exports.describe = 'search for a string within the repositories file'
 
 exports.builder = yargs => {
-    // TODO: this
+    // TODO: this better
     return yargs;
 }
 
@@ -22,12 +22,18 @@ exports.handler = argv => {
     });
 
     // get the contents of <file> for each repository
-    repositories.forEach(repository => {
-        (await octokit.repos.getContents({
-            file: argv.file
-        })).data;
-
+    repositories.forEach(async repository => {        
+        try {
+            const repoData = await octokit.repos.getContents({
+                owner: 'Financial-Times', //TODO split this out of path
+                repo: repository, //TODO split this out of path
+                path: `/${argv.file}`, //?? this is a limitation
+                file: argv.file
+            })
+            // TODO decode the data (from base64)?
+        } catch (error) {
+            console.log('error', error);
+        }
         // search the file for the string <search>// print the repo name if there is a match
-        console.log('Hello world', input);
     });
 }

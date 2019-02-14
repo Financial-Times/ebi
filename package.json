@@ -1,0 +1,27 @@
+{
+  "name": "github-repositories-contents-search",
+  "version": "1.0.0",
+  "description": "Search repositories for their contents.",
+  "main": "index.js",
+  "bin": {
+    "grcs": "./bin/grcs.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Financial-Times/github-repositories-contents-search.git"
+  },
+  "author": "Jennifer Johnson <jennifer.johnson@ft.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Financial-Times/github-repositories-contents-search/issues"
+  },
+  "homepage": "https://github.com/Financial-Times/github-repositories-contents-search#readme",
+  "dependencies": {
+    "@octokit/rest": "^16.15.0",
+    "save": "^2.3.3",
+    "yargs": "^13.1.0"
+  }
+}

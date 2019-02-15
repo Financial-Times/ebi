@@ -22,18 +22,34 @@ exports.handler = argv => {
     });
 
     // get the contents of <file> for each repository
-    repositories.forEach(async repository => {        
+    repositories.forEach(async repository => {
+        const owner = repository.split('/')[0];
+        const repo = repository.split('/')[1];
+
         try {
             const repoData = await octokit.repos.getContents({
-                owner: 'Financial-Times', //TODO split this out of path
-                repo: repository, //TODO split this out of path
-                path: `/${argv.file}`, //?? this is a limitation
-                file: argv.file
+                owner,
+                repo,
+                path: `${argv.file}`
             })
-            // TODO decode the data (from base64)?
+
+            // deal with case where path leads to a directory rather than a file
+            if (repoData.data.type === 'dir') {
+                throw new Error(`Incorrect value provided for <file>; the provided value '${argv.file}' is for a directory`)
+            } else {
+                const decodedContent = Buffer.from(repoData.data.content, 'base64').toString('utf8');
+
+                if (decodedContent.includes(argv.search)){
+                    console.log(repository);
+                }
+            }
+
         } catch (error) {
-            console.log('error', error);
+            if (error.status === 404) {
+                console.error(`404 ERROR: file '${argv.file}' not found in '${repository}'`)
+            } else {
+                console.error('error', error);
+            }
         }
-        // search the file for the string <search>// print the repo name if there is a match
     });
 }

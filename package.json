@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Financial-Times/github-repositories-contents-search#readme",
   "dependencies": {
     "@octokit/rest": "^16.15.0",
+    "jest": "^24.1.0",
     "save": "^2.3.3",
     "yargs": "^13.1.0"
   }

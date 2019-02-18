@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-const contentsCommand = require('../src/commands/contents');
-
 require('yargs')
-  .command(contentsCommand)
+  .commandDir('../src/commands')
   .argv;

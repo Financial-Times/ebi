@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { pick, pickBy, merge } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
 
@@ -18,7 +19,7 @@ const enginesReport = engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token } = argv;
+	const { token, search } = argv;
 	const repositories = fs
 		.readFileSync('/dev/stdin')
 		.toString()
@@ -29,28 +30,44 @@ exports.handler = function(argv = {}) {
 		githubToken: token,
 		path
 	});
+	const getJson = data => {
+		try {
+			return processJson(data);
+		} catch (error) {
+			throw new Error(
+				`JSON PARSE ERROR: ${path} parse error in '${repository}'`
+			);
+		}
+	};
+	const throwIfNoEngines = (json = {}) => {
+		const { engines } = json;
+		if (!engines) {
+			throw new Error(
+				`NOT FOUND: engines field not found in '${path}' in '${repository}'`
+			);
+		}
+		return engines;
+	};
+	const filterSearch = engines => {
+		if (search) {
+			const foundKeys = Object.keys(engines).filter(name => {
+				return name.includes(search);
+			});
+			const engineNameSearch = pick(engines, foundKeys);
+			const engineVersionSearch = pickBy(engines, value => {
+				return value.includes(search);
+			});
+
+			return merge(engineNameSearch, engineVersionSearch);
+		} else {
+			return engines;
+		}
+	};
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)
-			.then(data => {
-				try {
-					return processJson(data);
-				} catch (error) {
-					throw new Error(
-						`JSON PARSE ERROR: ${path} parse error in '${repository}'`
-					);
-				}
-			})
-			.then((json = {}) => {
-				const { engines } = json;
-
-				if (!engines) {
-					throw new Error(
-						`NOT FOUND: engines field not found in '${path}' in '${repository}'`
-					);
-				}
-
-				return engines;
-			})
+			.then(getJson)
+			.then(throwIfNoEngines)
+			.then(filterSearch)
 			.then(engines => {
 				const enginesOutput = enginesReport(engines);
 				console.log(`${repository}\t${enginesOutput}`);

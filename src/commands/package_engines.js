@@ -13,14 +13,9 @@ const engineVersionDisplay = ({ name, engines }) => `${name}@${engines[name]}`;
 // Report all engines in a tab separated format
 // eg, "node@8.13.0  npm@6.8.0"
 const enginesReport = engines => {
-    return Object.keys(engines).reduce((prev, engineName, curIndex) => {
-        const curEngineVersion = engineVersionDisplay({ name: engineName, engines });
-
-        const isFirst = !curIndex;
-        return isFirst
-            ? curEngineVersion
-            : `${prev}\t${curEngineVersion}`;
-    }, '');
+    return Object.keys(engines)
+        .map(name => `${name}@${engines[name]}`)
+        .join("\t");
 };
 
 exports.handler = function (argv = {}) {

@@ -36,7 +36,7 @@ describe('package:engines command handler', () => {
 		expect(console.error.mock.calls[0][0].message).toMatch('404 ERROR');
 	});
 
-	test('found engines in package.json logs repository', async () => {
+	test('engines in package.json, logs repository and version', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -54,7 +54,7 @@ describe('package:engines command handler', () => {
 		expect(console.log.mock.calls[0][0]).toContain('~10.15.0');
 	});
 
-	test('found multiple engines in package.json logs repository', async () => {
+	test('multiple engines in package.json, logs repositories and versions', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -74,7 +74,7 @@ describe('package:engines command handler', () => {
 		expect(console.log.mock.calls[0][0]).toContain('npm@6.8.0');
 	});
 
-	test('engines value not found in package.json, does not log', async () => {
+	test('engines value not found in package.json', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({}),

@@ -11,10 +11,6 @@ exports.builder = yargs => {
 }
 
 exports.handler = argv => {
-    /**
-     * Financial-Times/next-front-page
-     * Financial-Times/next-search-page
-     */
     const repositories = fs.readFileSync('/dev/stdin').toString().split("\n");
 
     const octokit = new Octokit({
@@ -22,7 +18,7 @@ exports.handler = argv => {
     });
 
     // get the contents of <file> for each repository
-    repositories.forEach(async repository => {
+    const allRepos = repositories.map(async repository => {
         const owner = repository.split('/')[0];
         const repo = repository.split('/')[1];
 
@@ -30,12 +26,12 @@ exports.handler = argv => {
             const repoData = await octokit.repos.getContents({
                 owner,
                 repo,
-                path: `${argv.file}`
+                path: argv.file
             })
 
             // deal with case where path leads to a directory rather than a file
-            if (repoData.data.type === 'dir') {
-                throw new Error(`Incorrect value provided for <file>; the provided value '${argv.file}' is for a directory`)
+            if (repoData.data.path !== argv.file) {
+                throw new Error(`Incorrect value provided for <file>; '${argv.file}' is not a file path`)
             } else {
                 const decodedContent = Buffer.from(repoData.data.content, 'base64').toString('utf8');
 
@@ -44,12 +40,15 @@ exports.handler = argv => {
                 }
             }
 
+            return repoData;
         } catch (error) {
             if (error.status === 404) {
                 console.error(`404 ERROR: file '${argv.file}' not found in '${repository}'`)
             } else {
-                console.error('error', error);
+                console.error(error);
             }
         }
     });
+
+    return Promise.all(allRepos);
 }

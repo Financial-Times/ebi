@@ -42,14 +42,18 @@ exports.handler = function(argv = {}) {
 			})
 			.then((json = {}) => {
 				const { engines } = json;
-				if (engines) {
-					const enginesOutput = enginesReport(engines);
-					console.log(`${repository}\t${enginesOutput}`);
-				} else {
-					console.error(
+
+				if (!engines) {
+					throw new Error(
 						`NOT FOUND: engines field not found in '${path}' in '${repository}'`
 					);
 				}
+
+				return engines;
+			})
+			.then(engines => {
+				const enginesOutput = enginesReport(engines);
+				console.log(`${repository}\t${enginesOutput}`);
 			})
 			.catch(error => {
 				console.error(error.message);

@@ -59,3 +59,8 @@ A recommended approach is to store auth tokens in your operating system's
 password management system (e.g. Keychain on macOS), retrieve it in your shell's
 rcfile (e.g. `~/.bashrc`) and assign it to an environment variable so that it is
 available to any shell that you run.
+
+## Code formatting with Prettier
+This repo uses [prettier](https://prettier.io/) for code formatting. To make the most of this when working locally:
+ - Install the `prettier-vscode` extension in the extension side bar
+ - Update your settings to format files on save, this will check your file meets the prettier guidelines and will fix it if it doesn't each time you save it. You can update the format on save setting at `Code` --> `Settings` --> update `"editor.formatOnSave": true`

@@ -30,7 +30,7 @@ describe('package command handler', () => {
 		const invalidRepo = 'Financial-Times/invalid';
 		standardInput = createStandardInput(invalidRepo);
 		nockScope.get(`/${invalidRepo}/contents/package.json`).reply(404, {
-			message: 'Not Found',
+			message: 'Not Found'
 		});
 		await packageHandler({ search: 'something' });
 		expect(console.error.mock.calls[0][0].message).toMatch('404 ERROR');
@@ -40,9 +40,9 @@ describe('package command handler', () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
-				name: 'next-front-page',
+				name: 'next-front-page'
 			}),
-			path: 'package.json',
+			path: 'package.json'
 		});
 		await packageHandler({ search: 'name' });
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
@@ -52,9 +52,9 @@ describe('package command handler', () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
-				name: 'next-front-page',
+				name: 'next-front-page'
 			}),
-			path: 'package.json',
+			path: 'package.json'
 		});
 		await packageHandler({ search: 'something-else' });
 		expect(console.log).not.toBeCalled();

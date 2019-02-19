@@ -30,7 +30,7 @@ describe('package:engines command handler', () => {
 		const invalidRepo = 'Financial-Times/invalid';
 		standardInput = createStandardInput(invalidRepo);
 		nockScope.get(`/${invalidRepo}/contents/package.json`).reply(404, {
-			message: 'Not Found',
+			message: 'Not Found'
 		});
 		await packageEnginesHandler();
 		expect(console.error.mock.calls[0][0].message).toMatch('404 ERROR');
@@ -41,10 +41,10 @@ describe('package:engines command handler', () => {
 			type: 'file',
 			content: base64EncodeObj({
 				engines: {
-					node: '~10.15.0',
-				},
+					node: '~10.15.0'
+				}
 			}),
-			path: 'package.json',
+			path: 'package.json'
 		});
 		await packageEnginesHandler();
 
@@ -60,10 +60,10 @@ describe('package:engines command handler', () => {
 			content: base64EncodeObj({
 				engines: {
 					node: '~10.15.0',
-					npm: '6.8.0',
-				},
+					npm: '6.8.0'
+				}
 			}),
-			path: 'package.json',
+			path: 'package.json'
 		});
 		await packageEnginesHandler();
 
@@ -78,7 +78,7 @@ describe('package:engines command handler', () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({}),
-			path: 'package.json',
+			path: 'package.json'
 		});
 		await packageEnginesHandler();
 		expect(console.log).not.toBeCalled();

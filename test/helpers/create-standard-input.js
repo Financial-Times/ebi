@@ -2,15 +2,14 @@ const fs = require('fs');
 
 jest.mock('fs');
 
-const createStandardInput = (data) => {
-    const mockReadFileSync = fs.readFileSync.mockImplementation(() => data);
+const createStandardInput = data => {
+	const mockReadFileSync = fs.readFileSync.mockImplementation(() => data);
 
-    return {
-        teardown: () => {
-            mockReadFileSync.mockReset();
-        }
-    }
-}
+	return {
+		teardown: () => {
+			mockReadFileSync.mockReset();
+		},
+	};
+};
 
 module.exports = createStandardInput;
-

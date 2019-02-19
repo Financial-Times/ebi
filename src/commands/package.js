@@ -2,27 +2,20 @@ const fs = require('fs');
 
 const getContents = require('../../lib/get-contents');
 
-exports.command = 'contents [--token=<token>] <file> <search>'
+exports.command = 'package <search>';
+exports.desc = 'search for a string within the `package.json` file';
 
-exports.describe = 'search for a string within the repositories file'
-
-exports.builder = yargs => {
-    // TODO: this better
-    return yargs;
-}
-
-exports.handler = argv => {
-    const { file: path, token, search } = argv;
+exports.handler = function (argv) {
+    const { token, search } = argv;
     const repositories = fs.readFileSync('/dev/stdin').toString().split("\n");
+    const path = 'package.json';
 
-    const getPathContents = getContents({
+    const getPackageJson = getContents({
         githubToken: token,
         path
     });
-
-    // get the contents of <file> for each repository
     const allRepos = repositories.map(
-        repository => getPathContents(repository)
+        repository => getPackageJson(repository)
             .then((contents) => {
                 if (contents.includes(search)){
                     console.log(repository);
@@ -34,4 +27,4 @@ exports.handler = argv => {
     );
 
     return Promise.all(allRepos);
-}
+};

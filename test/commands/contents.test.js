@@ -33,7 +33,7 @@ describe('contents command handler', () => {
         expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
     });
 
-    test.only('when `contents` command is used with a <file> path that leads to a directory rather than a file, the relevant error is logged', async () => {
+    test('when `contents` command is used with a <file> path that leads to a directory rather than a file, the relevant error is logged', async () => {
         nockScope.get(`/${repo}/contents/server`)
             .reply(200, [
                 { path: 'app.js' },

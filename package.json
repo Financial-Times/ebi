@@ -19,6 +19,9 @@
     "url": "https://github.com/Financial-Times/github-repositories-contents-search/issues"
   },
   "homepage": "https://github.com/Financial-Times/github-repositories-contents-search#readme",
+  "engines": {
+    "node": "10.15.0"
+  },
   "dependencies": {
     "@octokit/rest": "^16.15.0",
     "nock": "^10.0.6",

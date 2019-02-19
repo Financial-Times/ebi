@@ -21,6 +21,9 @@ exports.handler = function (argv) {
                     console.log(repository);
                 }
             })
+            .catch(error => {
+                console.error(error);
+            })
     );
 
     return Promise.all(allRepos);

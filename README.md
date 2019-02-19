@@ -16,7 +16,6 @@ with all `repo` scopes.
 
 ## Usage
 
-
 ```
 $ <list_of_repositories> | ./bin/grcs.js <command>                        Search the contents of a list of repositories,
                                                                           where <list_of_repositories> is a carriage
@@ -33,9 +32,10 @@ Commands:
 ```
 
 ### WIP: Current limitations
-- Only runs locally
-- Requires list of repositories to be piped in from `stdOut`
-- See associated issues for list of commands / options still to be implemented
+
+-   Only runs locally
+-   Requires list of repositories to be piped in from `stdOut`
+-   See associated issues for list of commands / options still to be implemented
 
 ## GitHub personal access token security
 
@@ -44,7 +44,7 @@ with all `repo` scopes. This is _very powerful_ as it has access to modify a
 repository's settings, so it is strongly recommended that you store this token
 securely.
 
-Once you have created a [new GitHub personal access token with all `repo` scopes](https://github.com/settings/tokens/new?description=Manage%20GitHub%20Apps%20CLI&scopes=repo "Click here to create a new GitHub personal access token"),
+Once you have created a [new GitHub personal access token with all `repo` scopes](https://github.com/settings/tokens/new?description=Manage%20GitHub%20Apps%20CLI&scopes=repo 'Click here to create a new GitHub personal access token'),
 you can store it in an environment variable and pass it to `manage-github-apps`
 whenever you run a command that requires the `--token` option:
 
@@ -61,6 +61,8 @@ rcfile (e.g. `~/.bashrc`) and assign it to an environment variable so that it is
 available to any shell that you run.
 
 ## Code formatting with Prettier
+
 This repo uses [prettier](https://prettier.io/) for code formatting. To make the most of this when working locally:
- - Install the `prettier-vscode` extension in the extension side bar
- - Update your settings to format files on save, this will check your file meets the prettier guidelines and will fix it if it doesn't each time you save it. You can update the format on save setting at `Code` --> `Settings` --> update `"editor.formatOnSave": true`
+
+-   Install the `prettier-vscode` extension in the extension side bar
+-   Update your settings to format files on save, this will check your file meets the prettier guidelines and will fix it if it doesn't each time you save it. You can update the format on save setting at `Code` --> `Settings` --> update `"editor.formatOnSave": true`

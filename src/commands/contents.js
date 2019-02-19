@@ -20,7 +20,7 @@ exports.handler = argv => {
 
 	const getPathContents = getContents({
 		githubToken: token,
-		path,
+		path
 	});
 
 	// get the contents of <file> for each repository

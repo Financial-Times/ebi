@@ -15,7 +15,7 @@ exports.handler = function(argv) {
 
 	const getPackageJson = getContents({
 		githubToken: token,
-		path,
+		path
 	});
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)

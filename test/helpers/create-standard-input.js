@@ -8,7 +8,7 @@ const createStandardInput = data => {
 	return {
 		teardown: () => {
 			mockReadFileSync.mockReset();
-		},
+		}
 	};
 };
 

@@ -9,7 +9,6 @@ const processJson = content => {
 	return JSON.parse(content);
 };
 
-const engineVersionDisplay = ({ name, engines }) => `${name}@${engines[name]}`;
 // Report all engines in a tab separated format
 // eg, "node@8.13.0  npm@6.8.0"
 const enginesReport = engines => {

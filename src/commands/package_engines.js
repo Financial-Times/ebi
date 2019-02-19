@@ -5,12 +5,26 @@ const getContents = require('../../lib/get-contents');
 exports.command = 'package:engines [search]';
 exports.desc = 'search for a string within the `package.json` engines field';
 
-const processJson = (content) => {  
+const processJson = (content) => {
     return JSON.parse(content);
 };
 
-exports.handler = function (argv) {
-    const { token, search } = argv;
+const engineVersionDisplay = ({ name, engines }) => `${name}@${engines[name]}`;
+// Report all engines in a tab separated format
+// eg, "node@8.13.0  npm@6.8.0"
+const enginesReport = engines => {
+    return Object.keys(engines).reduce((prev, engineName, curIndex) => {
+        const curEngineVersion = engineVersionDisplay({ name: engineName, engines });
+
+        const isFirst = !curIndex;
+        return isFirst
+            ? curEngineVersion
+            : `${prev}\t${curEngineVersion}`;
+    }, '');
+};
+
+exports.handler = function (argv = {}) {
+    const { token } = argv;
     const repositories = fs.readFileSync('/dev/stdin').toString().split("\n");
     const path = 'package.json';
 
@@ -20,22 +34,25 @@ exports.handler = function (argv) {
     });
     const allRepos = repositories.map(
         repository => getPackageJson(repository)
-            .then((processJson))
-            .catch(() => {
-                console.error(`JSON PARSE ERROR: ${path} parse error in '${repository}'`)
+            .then(data => {
+                try {
+                    return processJson(data);
+                } catch (error) {
+                    throw new Error(`JSON PARSE ERROR: ${path} parse error in '${repository}'`);
+                }
             })
             .then((json = {}) => {
                 const { engines } = json;
                 if (engines) {
-                    const enginesOutput = Object.keys(engines).reduce((prevEngineName, engineName, curIndex) => {
-                        const prev = !!curIndex ? `${prevEngineName}@${engines[prevEngineName]}\t` : '';
-                        return  `${prev}${engineName}@${engines[engineName]}`
-                    }, '');
+                    const enginesOutput = enginesReport(engines);
                     console.log(`${repository}\t${enginesOutput}`);
                 } else {
                     console.error(`NOT FOUND: engines field not found in '${path}' in '${repository}'`)
                 }
                 
+            })
+            .catch(error => {
+                console.error(error);
             })
     );
 

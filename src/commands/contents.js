@@ -1,5 +1,6 @@
 const fs = require('fs');
-const Octokit = require('@octokit/rest');
+
+const getContents = require('../../lib/get-contents');
 
 exports.command = 'contents [--token=<token>] <file> <search>'
 
@@ -11,44 +12,26 @@ exports.builder = yargs => {
 }
 
 exports.handler = argv => {
+    const { file: path, token, search } = argv;
     const repositories = fs.readFileSync('/dev/stdin').toString().split("\n");
 
-    const octokit = new Octokit({
-        auth: `token ${argv.token}`
+    const getPathContents = getContents({
+        githubToken: token,
+        path
     });
 
     // get the contents of <file> for each repository
-    const allRepos = repositories.map(async repository => {
-        const owner = repository.split('/')[0];
-        const repo = repository.split('/')[1];
-
-        try {
-            const repoData = await octokit.repos.getContents({
-                owner,
-                repo,
-                path: argv.file
-            })
-
-            // deal with case where path leads to a directory rather than a file
-            if (repoData.data.path !== argv.file) {
-                throw new Error(`Incorrect value provided for <file>; '${argv.file}' is not a file path`)
-            } else {
-                const decodedContent = Buffer.from(repoData.data.content, 'base64').toString('utf8');
-
-                if (decodedContent.includes(argv.search)){
+    const allRepos = repositories.map(
+        repository => getPathContents(repository)
+            .then((contents) => {
+                if (contents.includes(search)){
                     console.log(repository);
                 }
-            }
-
-            return repoData;
-        } catch (error) {
-            if (error.status === 404) {
-                console.error(`404 ERROR: file '${argv.file}' not found in '${repository}'`)
-            } else {
+            })
+            .catch(error => {
                 console.error(error);
-            }
-        }
-    });
+            })
+    );
 
     return Promise.all(allRepos);
 }

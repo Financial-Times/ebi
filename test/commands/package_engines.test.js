@@ -76,6 +76,50 @@ describe('package:engines command handler', () => {
 		expect(console.log.mock.calls[0][0]).toContain('npm@6.8.0');
 	});
 
+	test('search specific engine in package.json, only logs that repository and version', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0',
+					npm: '6.8.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			search: 'node'
+		});
+
+		expect(console.log.mock.calls[0][0]).toContain(
+			'Financial-Times/next-front-page'
+		);
+		expect(console.log.mock.calls[0][0]).toContain('node@~10.15.0');
+		expect(console.log.mock.calls[0][0]).not.toContain('npm@6.8.0');
+	});
+
+	test('search specific version number in package.json, only logs that repository and version', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0',
+					npm: '6.8.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			search: '6.8.0'
+		});
+
+		expect(console.log.mock.calls[0][0]).toContain(
+			'Financial-Times/next-front-page'
+		);
+		expect(console.log.mock.calls[0][0]).not.toContain('node@~10.15.0');
+		expect(console.log.mock.calls[0][0]).toContain('npm@6.8.0');
+	});
+
 	test('engines value not found in package.json', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',

@@ -106,6 +106,26 @@ describe('package:engines command handler', () => {
 		);
 	});
 
+	test('search specific engine in package.json, only shows repos that match', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0',
+					npm: '6.8.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			search: '8.0.0'
+		});
+
+		expect(console.log).not.toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
+		);
+	});
+
 	test('search specific version number in package.json, only logs that repository and version', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',

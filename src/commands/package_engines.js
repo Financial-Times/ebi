@@ -70,7 +70,10 @@ exports.handler = function(argv = {}) {
 			.then(filterSearch)
 			.then(engines => {
 				const enginesOutput = enginesReport(engines);
-				console.log(`${repository}\t${enginesOutput}`);
+				const hasEngines = !!Object.keys(engines).length;
+				if (hasEngines) {
+					console.log(`${repository}\t${enginesOutput}`);
+				}
 			})
 			.catch(error => {
 				console.error(error.message);

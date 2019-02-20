@@ -41,8 +41,8 @@ describe('contents command handler', () => {
 			.get(`/${repo}/contents/server`)
 			.reply(200, [{ path: 'app.js' }, { path: 'libs' }]);
 		await contentsHandler({ file: 'server', search: 'app' });
-		expect(console.error.mock.calls[0][0].message).toMatch(
-			`'server' is not a file path`
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining(`'server' is not a file path`)
 		);
 	});
 

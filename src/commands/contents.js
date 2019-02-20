@@ -32,7 +32,7 @@ exports.handler = argv => {
 				}
 			})
 			.catch(error => {
-				console.error(error);
+				console.error(error.message);
 			})
 	);
 

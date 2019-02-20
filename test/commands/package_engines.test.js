@@ -33,7 +33,9 @@ describe('package:engines command handler', () => {
 			message: 'Not Found'
 		});
 		await packageEnginesHandler();
-		expect(console.error.mock.calls[0][0].message).toMatch('404 ERROR');
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('404 ERROR')
+		);
 	});
 
 	test('found engines in package.json logs repository', async () => {

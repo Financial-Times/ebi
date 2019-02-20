@@ -33,7 +33,9 @@ describe('package command handler', () => {
 			message: 'Not Found'
 		});
 		await packageHandler({ search: 'something' });
-		expect(console.error.mock.calls[0][0].message).toMatch('404 ERROR');
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('404 ERROR')
+		);
 	});
 
 	test('found <search> value logs repository', async () => {

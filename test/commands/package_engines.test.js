@@ -50,10 +50,10 @@ describe('package:engines command handler', () => {
 		});
 		await packageEnginesHandler();
 
-		expect(console.log.mock.calls[0][0]).toContain(
-			'Financial-Times/next-front-page'
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
 		);
-		expect(console.log.mock.calls[0][0]).toContain('~10.15.0');
+		expect(console.log).toBeCalledWith(expect.stringContaining('~10.15.0'));
 	});
 
 	test('multiple engines in package.json, logs repositories and versions', async () => {
@@ -69,11 +69,15 @@ describe('package:engines command handler', () => {
 		});
 		await packageEnginesHandler();
 
-		expect(console.log.mock.calls[0][0]).toContain(
-			'Financial-Times/next-front-page'
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
 		);
-		expect(console.log.mock.calls[0][0]).toContain('node@~10.15.0');
-		expect(console.log.mock.calls[0][0]).toContain('npm@6.8.0');
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('node@~10.15.0')
+		);
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('npm@6.8.0')
+		);
 	});
 
 	test('search specific engine in package.json, only logs that repository and version', async () => {
@@ -91,11 +95,15 @@ describe('package:engines command handler', () => {
 			search: 'node'
 		});
 
-		expect(console.log.mock.calls[0][0]).toContain(
-			'Financial-Times/next-front-page'
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
 		);
-		expect(console.log.mock.calls[0][0]).toContain('node@~10.15.0');
-		expect(console.log.mock.calls[0][0]).not.toContain('npm@6.8.0');
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('node@~10.15.0')
+		);
+		expect(console.log).not.toBeCalledWith(
+			expect.stringContaining('npm@6.8.0')
+		);
 	});
 
 	test('search specific version number in package.json, only logs that repository and version', async () => {
@@ -113,11 +121,15 @@ describe('package:engines command handler', () => {
 			search: '6.8.0'
 		});
 
-		expect(console.log.mock.calls[0][0]).toContain(
-			'Financial-Times/next-front-page'
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
 		);
-		expect(console.log.mock.calls[0][0]).not.toContain('node@~10.15.0');
-		expect(console.log.mock.calls[0][0]).toContain('npm@6.8.0');
+		expect(console.log).not.toBeCalledWith(
+			expect.stringContaining('node@~10.15.0')
+		);
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('npm@6.8.0')
+		);
 	});
 
 	test('engines value not found in package.json', async () => {

@@ -80,7 +80,7 @@ describe('package command handler', () => {
 				path: 'package.json'
 			});
 		});
-		await packageEnginesHandler({ search: 'name', limit: 2 });
+		await packageHandler({ search: 'name', limit: 2 });
 		expect(console.log).toHaveBeenCalledTimes(2);
 	});
 
@@ -100,7 +100,7 @@ describe('package command handler', () => {
 				path: 'package.json'
 			});
 		});
-		await packageEnginesHandler({ search: 'name', limit: 2 });
+		await packageHandler({ search: 'name', limit: 2 });
 		expect(console.log).toHaveBeenCalledTimes(2);
 	});
 
@@ -112,7 +112,7 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({ search: 'name', limit: 2 });
+		await packageHandler({ search: 'name', limit: 2 });
 
 		expect(console.log).toHaveBeenCalledTimes(1);
 	});

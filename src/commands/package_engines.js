@@ -4,7 +4,21 @@ const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 
 exports.command = 'package:engines [search]';
-exports.desc = 'search for a string within the `package.json` engines field';
+exports.desc = 'Search `engines` field inside the `package.json` file';
+
+exports.builder = yargs => {
+	return yargs
+		.positional('search', {
+			type: 'string',
+			describe: 'What to search for. If empty, returns all `engines`'
+		})
+		.option('token', {
+			required: true,
+			type: 'string',
+			describe:
+				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+		});
+};
 
 const processJson = content => {
 	return JSON.parse(content);

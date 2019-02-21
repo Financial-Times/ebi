@@ -3,12 +3,25 @@ const getRepositories = require('../../lib/get-repositories');
 
 exports.command = 'contents <file> [search]';
 
-exports.describe =
-	'Search for a string within the repositories file. Returns whether the file exists if `search` is empty.';
+exports.describe = 'Search within a repositories file';
 
 exports.builder = yargs => {
-	// TODO: this better
-	return yargs;
+	return yargs
+		.positional('file', {
+			type: 'string',
+			describe: 'File path to search in GitHub contents API'
+		})
+		.positional('search', {
+			type: 'string',
+			describe:
+				'What to search for. If empty, returns whether the file exists or not'
+		})
+		.option('token', {
+			required: true,
+			type: 'string',
+			describe:
+				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+		});
 };
 
 exports.handler = argv => {
@@ -29,7 +42,11 @@ exports.handler = argv => {
 				const containsSearchItem = contents.includes(search);
 
 				if (noSearch || containsSearchItem) {
-					console.log(repository);
+					return console.log(repository);
+				} else {
+					console.error(
+						`INFO: '${path}' has no match for '${search}' in '${repository}'`
+					);
 				}
 			})
 			.catch(error => {

@@ -55,11 +55,23 @@ describe('contents command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
-	test('empty `contents` search, does not log if file does not exist', async () => {
+	test('logs error if file does not exist', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
+		await contentsHandler({ file: 'Procfile', search: 'something' });
+
+		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
+		);
+	});
+
+	test('logs error if file does not exist (with no search)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
 		await contentsHandler({ file: 'Procfile' });
-		expect(console.log).not.toBeCalledWith(
-			'Financial-Times/next-front-page'
+
+		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
 		);
 	});
 
@@ -132,6 +144,10 @@ describe('contents command handler', () => {
 			file: 'Procfile',
 			search: 'something-else'
 		});
-		expect(console.log).not.toBeCalled();
+
+		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no match')
+		);
 	});
 });

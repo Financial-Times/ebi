@@ -2,7 +2,21 @@ const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 
 exports.command = 'package <search>';
-exports.desc = 'search for a string within the `package.json` file';
+exports.desc = 'Search within the `package.json` file';
+
+exports.builder = yargs => {
+	return yargs
+		.positional('search', {
+			type: 'string',
+			describe: 'What to search for'
+		})
+		.option('token', {
+			required: true,
+			type: 'string',
+			describe:
+				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+		});
+};
 
 exports.handler = function(argv) {
 	const { token, search, limit } = argv;

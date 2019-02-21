@@ -44,6 +44,24 @@ describe('contents command handler', () => {
 		);
 	});
 
+	test('empty `contents` search, logs existence of file', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: n-cluster server/init.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({ file: 'Procfile' });
+		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
+	});
+
+	test('empty `contents` search, does not log if file does not exist', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
+		await contentsHandler({ file: 'Procfile' });
+		expect(console.log).not.toBeCalledWith(
+			'Financial-Times/next-front-page'
+		);
+	});
+
 	test('<search> value not found, does not log', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',

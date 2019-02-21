@@ -1,7 +1,7 @@
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 
-exports.command = 'package [--token=<token>] [--limit=<limit>] <search>';
+exports.command = 'package <search>';
 exports.desc = 'search for a string within the `package.json` file';
 
 exports.handler = function(argv) {

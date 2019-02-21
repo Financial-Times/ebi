@@ -3,8 +3,7 @@ const { pick, pickBy, merge } = require('lodash');
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 
-exports.command =
-	'package:engines [--token=<token>] [--limit=<limit>] [search]';
+exports.command = 'package:engines [search]';
 exports.desc = 'search for a string within the `package.json` engines field';
 
 const processJson = content => {

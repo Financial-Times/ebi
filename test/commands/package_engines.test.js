@@ -2,13 +2,15 @@ const nock = require('nock');
 
 const createStandardInput = require('../helpers/create-standard-input');
 const { base64EncodeObj } = require('../helpers/base64');
-const packageEnginesCommand = require('../../src/commands/package_engines');
+const {
+	handler: packageEnginesHandler
+} = require('../../src/commands/package_engines');
 const repo = 'Financial-Times/next-front-page';
 
-describe('package:engines command handler', () => {
-	let standardInput;
-	const packageEnginesHandler = packageEnginesCommand.handler;
+let nockScope;
+let standardInput;
 
+describe('package:engines command handler', () => {
 	beforeEach(() => {
 		standardInput = createStandardInput(repo);
 		nockScope = nock('https://api.github.com/repos');
@@ -188,31 +190,63 @@ describe('package:engines command handler', () => {
 		expect(console.log).toHaveBeenCalledTimes(2);
 	});
 
-	test('when 2 repos are tested and a limit of 2 is specified, 2 repos are logged', async () => {
-		const repositories = [
+	// test('when 2 repos are tested and a limit of 2 is specified, 2 repos are logged', async () => {
+	// 	const repositories = [
+	// 		'Financial-Times/next-front-page',
+	// 		'Financial-Times/next-signup'
+	// 	];
+	// 	const repositoriesForStdIn = repositories.join('\n');
+	// 	standardInput = createStandardInput(repositoriesForStdIn);
+	// 	repositories.forEach(repo => {
+	// 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+	// 			type: 'file',
+	// 			content: base64EncodeObj({
+	// 				engines: {
+	// 					node: '~10.15.0'
+	// 				}
+	// 			}),
+	// 			path: 'package.json'
+	// 		});
+	// 	});
+	// 	await packageEnginesHandler({
+	// 		limit: 2
+	// 	});
+	// 	expect(console.log).toHaveBeenCalledTimes(2);
+	// });
+
+	// 	test('when 1 repos is tested and a limit of 2 is specified, 1 repo is logged', async () => {
+	// 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+	// 			type: 'file',
+	// 			content: base64EncodeObj({
+	// 				engines: {
+	// 					node: '~10.15.0'
+	// 				}
+	// 			}),
+	// 			path: 'package.json'
+	// 		});
+	// 		await packageEnginesHandler({ limit: 2 });
+
+	// 		expect(console.log).toHaveBeenCalledTimes(1);
+	// 	});
+});
+
+describe.each([
+	[
+		[
 			'Financial-Times/next-front-page',
-			'Financial-Times/next-signup'
-		];
+			'Financial-Times/next-signup',
+			'Financial-Times/n-gage'
+		],
+		2
+	],
+	[['Financial-Times/next-front-page', 'Financial-Times/next-signup'], 2],
+	[['Financial-Times/next-front-page'], 1]
+])('test limit flag of value 2', (repositories, numResults) => {
+	test(`${
+		repositories.length
+	} repos returns ${numResults} results`, async () => {
 		const repositoriesForStdIn = repositories.join('\n');
 		standardInput = createStandardInput(repositoriesForStdIn);
-		repositories.forEach(repo => {
-			nockScope.get(`/${repo}/contents/package.json`).reply(200, {
-				type: 'file',
-				content: base64EncodeObj({
-					engines: {
-						node: '~10.15.0'
-					}
-				}),
-				path: 'package.json'
-			});
-		});
-		await packageEnginesHandler({
-			limit: 2
-		});
-		expect(console.log).toHaveBeenCalledTimes(2);
-	});
-
-	test('when 1 repos is tested and a limit of 2 is specified, 1 repo is logged', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -223,7 +257,6 @@ describe('package:engines command handler', () => {
 			path: 'package.json'
 		});
 		await packageEnginesHandler({ limit: 2 });
-
-		expect(console.log).toHaveBeenCalledTimes(1);
+		expect(console.log).toHaveBeenCalledTimes(numResults);
 	});
 });

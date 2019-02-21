@@ -1,3 +1,4 @@
+/*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 

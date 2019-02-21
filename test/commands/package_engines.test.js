@@ -1,3 +1,4 @@
+/*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const nock = require('nock');
 
 const createStandardInput = require('../helpers/create-standard-input');

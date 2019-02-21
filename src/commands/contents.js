@@ -21,6 +21,11 @@ exports.builder = yargs => {
 			type: 'string',
 			describe:
 				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+		})
+		.option('limit', {
+			required: false,
+			type: 'number',
+			describe: 'limit the number of results to return to this number'
 		});
 };
 

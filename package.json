@@ -25,6 +25,11 @@
 	"engines": {
 		"node": "10.15.0"
 	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "npm run lint"
+		}
+	},
 	"dependencies": {
 		"@octokit/plugin-throttling": "^2.4.0",
 		"@octokit/rest": "^16.15.0",

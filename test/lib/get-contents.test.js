@@ -4,6 +4,8 @@ const { base64Encode } = require('../helpers/base64');
 const getContents = require('../../lib/get-contents');
 const repo = 'Financial-Times/next-front-page';
 
+let nockScope;
+
 describe('getContents', () => {
 	beforeEach(() => {
 		nockScope = nock('https://api.github.com/repos');

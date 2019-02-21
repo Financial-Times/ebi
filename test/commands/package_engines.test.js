@@ -161,4 +161,16 @@ describe('package:engines command handler', () => {
 		await packageEnginesHandler();
 		expect(console.log).not.toBeCalled();
 	});
+
+	test('engines value not found in package.json logs to console error', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler();
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('engines field not found')
+		);
+	});
 });

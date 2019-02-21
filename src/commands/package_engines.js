@@ -53,7 +53,7 @@ exports.handler = function(argv = {}) {
 			);
 		}
 	};
-	const throwIfNoEngines = (json = {}) => {
+	const throwIfNoEngines = repository => (json = {}) => {
 		const { engines } = json;
 		if (!engines) {
 			throw new Error(
@@ -80,7 +80,7 @@ exports.handler = function(argv = {}) {
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)
 			.then(getJson)
-			.then(throwIfNoEngines)
+			.then(throwIfNoEngines(repository))
 			.then(filterSearch)
 			.then(engines => {
 				const enginesOutput = enginesReport(engines);

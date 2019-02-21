@@ -173,4 +173,16 @@ describe('package:engines command handler', () => {
 			expect.stringContaining('engines field not found')
 		);
 	});
+
+	test('package.json not valid JSON', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: 'something-invalid',
+			path: 'package.json'
+		});
+		await packageEnginesHandler();
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('parse error')
+		);
+	});
 });

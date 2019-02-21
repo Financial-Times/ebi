@@ -155,7 +155,7 @@ describe('package:engines command handler', () => {
 		);
 	});
 
-	test('engines value not found in package.json', async () => {
+	test('engines value not found in package.json does not log', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({}),

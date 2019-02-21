@@ -1,9 +1,10 @@
-const fs = require('fs');
 const { pick, pickBy, merge } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
+const getRepositories = require('../../lib/get-repositories');
 
-exports.command = 'package:engines [search]';
+exports.command =
+	'package:engines [--token=<token>] [--limit=<limit>] [search]';
 exports.desc = 'search for a string within the `package.json` engines field';
 
 const processJson = content => {
@@ -19,12 +20,9 @@ const enginesReport = engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, search } = argv;
-	const repositories = fs
-		.readFileSync('/dev/stdin')
-		.toString()
-		.split('\n');
+	const { token, limit, search } = argv;
 	const path = 'package.json';
+	const repositories = getRepositories(limit);
 
 	const getPackageJson = getContents({
 		githubToken: token,

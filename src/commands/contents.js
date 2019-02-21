@@ -2,9 +2,10 @@ const fs = require('fs');
 
 const getContents = require('../../lib/get-contents');
 
-exports.command = 'contents [--token=<token>] <file> <search>';
+exports.command = 'contents [--token=<token>] <file> [search]';
 
-exports.describe = 'search for a string within the repositories file';
+exports.describe =
+	'Search for a string within the repositories file. Returns whether the file exists if `search` is empty.';
 
 exports.builder = yargs => {
 	// TODO: this better
@@ -27,7 +28,10 @@ exports.handler = argv => {
 	const allRepos = repositories.map(repository =>
 		getPathContents(repository)
 			.then(contents => {
-				if (contents.includes(search)) {
+				const noSearch = !search;
+				const containsSearchItem = contents.includes(search);
+
+				if (noSearch || containsSearchItem) {
 					console.log(repository);
 				}
 			})

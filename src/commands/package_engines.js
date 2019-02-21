@@ -1,3 +1,4 @@
+/*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const { pick, pickBy, merge } = require('lodash');
 
 const getContents = require('../../lib/get-contents');

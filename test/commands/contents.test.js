@@ -1,6 +1,7 @@
 const nock = require('nock');
 
 const createStandardInput = require('../helpers/create-standard-input');
+const { base64Encode } = require('../helpers/base64');
 const contentsCommand = require('../../src/commands/contents');
 const repo = 'Financial-Times/next-front-page';
 
@@ -26,7 +27,7 @@ describe('contents command handler', () => {
 	test('when contents handler is called with valid <file> and <search> values, a list of repositories are logged', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: 'd2ViOiBuLWNsdXN0ZXIgc2VydmVyL2luaXQuanM=', //base64 encoding of 'web: n-cluster server/init.js'
+			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
 		await contentsHandler({ file: 'Procfile', search: 'web' });
@@ -46,7 +47,7 @@ describe('contents command handler', () => {
 	test('<search> value not found, does not log', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: 'd2ViOiBuLWNsdXN0ZXIgc2VydmVyL2luaXQuanM=', //base64 encoding of 'web: n-cluster server/init.js'
+			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
 		await contentsHandler({

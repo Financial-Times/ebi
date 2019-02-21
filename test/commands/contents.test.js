@@ -86,7 +86,7 @@ describe('contents command handler', () => {
 		repositories.forEach(repo => {
 			nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 				type: 'file',
-				content: 'd2ViOiBuLWNsdXN0ZXIgc2VydmVyL2luaXQuanM=', //base64 encoding of 'web: n-cluster server/init.js'
+				content: base64Encode('web: n-cluster server/init.js'),
 				path: 'Procfile'
 			});
 		});

@@ -46,7 +46,7 @@ exports.handler = function(argv = {}) {
 		githubToken: token,
 		path
 	});
-	const getJson = data => {
+	const getJson = repository => data => {
 		try {
 			return processJson(data);
 		} catch (error) {
@@ -81,7 +81,7 @@ exports.handler = function(argv = {}) {
 	};
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)
-			.then(getJson)
+			.then(getJson(repository))
 			.then(throwIfNoEngines(repository))
 			.then(filterSearch)
 			.then(engines => {

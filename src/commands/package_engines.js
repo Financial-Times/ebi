@@ -79,6 +79,10 @@ exports.handler = function(argv = {}) {
 				const hasEngines = !!Object.keys(engines).length;
 				if (hasEngines) {
 					console.log(`${repository}\t${enginesOutput}`);
+				} else {
+					console.error(
+						`INFO: '${path}' has no match for '${search}' in '${repository}'`
+					);
 				}
 			})
 			.catch(error => {

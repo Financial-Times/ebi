@@ -186,6 +186,19 @@ describe('package:engines command handler', () => {
 		);
 	});
 
+	test('engines search not found in package.json, logs info message in console error', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({ engines: {} }),
+			path: 'package.json'
+		});
+		await packageEnginesHandler();
+		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no match')
+		);
+	});
+
 	test('package.json not valid JSON', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',

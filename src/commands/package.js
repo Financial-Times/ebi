@@ -19,7 +19,7 @@ exports.builder = yargs => {
 		.option('limit', {
 			required: false,
 			type: 'number',
-			describe: 'limit the number of results to return to this number'
+			describe: 'limit the number of repositories to search for'
 		});
 };
 

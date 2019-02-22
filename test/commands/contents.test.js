@@ -6,11 +6,10 @@ const { base64Encode } = require('../helpers/base64');
 const { handler: contentsHandler } = require('../../src/commands/contents');
 const repo = 'Financial-Times/next-front-page';
 
-let standardInput;
 let nockScope;
 
 beforeEach(() => {
-	standardInput = createStandardInput(repo);
+	createStandardInput(repo);
 	nockScope = nock('https://api.github.com/repos');
 	// NB comment out this spy on console.error if you want to see errors during your tests
 	jest.spyOn(console, 'error')
@@ -111,7 +110,7 @@ describe.each([
 		repositories.length
 	} repos returns ${numResults} results`, async () => {
 		const repositoriesForStdIn = repositories.join('\n');
-		standardInput = createStandardInput(repositoriesForStdIn);
+		createStandardInput(repositoriesForStdIn);
 		repositories.forEach(repo => {
 			nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 				type: 'file',

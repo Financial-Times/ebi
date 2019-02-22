@@ -26,6 +26,14 @@ afterEach(() => {
 });
 
 describe('contents command handler', () => {
+	test('ignore empty strings', async () => {
+		createStandardInput('');
+
+		await contentsHandler({ file: 'Procfile', search: 'web' });
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+
 	test('when contents handler is called with valid <file> and <search> values, a list of repositories are logged', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',

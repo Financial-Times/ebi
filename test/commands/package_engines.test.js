@@ -30,6 +30,14 @@ afterEach(() => {
 });
 
 describe('package:engines command handler', () => {
+	test('ignore empty strings', async () => {
+		createStandardInput('');
+
+		await packageEnginesHandler();
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+
 	test('repository not found', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
 		standardInput = createStandardInput(invalidRepo);

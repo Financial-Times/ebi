@@ -1,7 +1,7 @@
-const fs = require('fs');
 const { pick, pickBy, merge } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
+const getRepositories = require('../../lib/get-repositories');
 
 exports.command = 'package:engines [search]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
@@ -17,6 +17,11 @@ exports.builder = yargs => {
 			type: 'string',
 			describe:
 				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+		})
+		.option('limit', {
+			required: false,
+			type: 'number',
+			describe: 'limit the number of repositories to search for'
 		});
 };
 
@@ -33,12 +38,9 @@ const enginesReport = engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, search } = argv;
-	const repositories = fs
-		.readFileSync('/dev/stdin')
-		.toString()
-		.split('\n');
+	const { token, limit, search } = argv;
 	const path = 'package.json';
+	const repositories = getRepositories(limit);
 
 	const getPackageJson = getContents({
 		githubToken: token,

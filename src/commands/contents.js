@@ -1,6 +1,5 @@
-const fs = require('fs');
-
 const getContents = require('../../lib/get-contents');
+const getRepositories = require('../../lib/get-repositories');
 
 exports.command = 'contents <file> [search]';
 
@@ -22,15 +21,18 @@ exports.builder = yargs => {
 			type: 'string',
 			describe:
 				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+		})
+		.option('limit', {
+			required: false,
+			type: 'number',
+			describe: 'limit the number of repositories to search for'
 		});
 };
 
 exports.handler = argv => {
-	const { file: path, token, search } = argv;
-	const repositories = fs
-		.readFileSync('/dev/stdin')
-		.toString()
-		.split('\n');
+	const { file: path, token, search, limit } = argv;
+
+	const repositories = getRepositories(limit);
 
 	const getPathContents = getContents({
 		githubToken: token,

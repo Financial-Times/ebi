@@ -4,7 +4,7 @@
 	"description": "Search repositories for their contents.",
 	"main": "index.js",
 	"bin": {
-		"grcs": "./bin/grcs.js"
+		"ebi": "./bin/ebi.js"
 	},
 	"scripts": {
 		"lint": "eslint *.js src/ lib/ test/",

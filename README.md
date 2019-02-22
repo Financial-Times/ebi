@@ -1,41 +1,42 @@
-<h1 align="center">
-	<img src="https://user-images.githubusercontent.com/51677/52789376-8d29e100-305b-11e9-83ac-c39dc692138f.png" width="120" alt="GitHub Repositories Contents Search"><br>
-	grcs
-	<a href="https://circleci.com/gh/Financial-Times/github-repositories-contents-search/tree/master">
-		<img alt="Build Status" src="https://circleci.com/gh/Financial-Times/github-repositories-contents-search/tree/master.svg?style=svg">
-	</a>
-</h1>
+# 🦐 Ebi: GitHub repositories contents search
 
-Use the command line to search repositories for their contents
+<a href="https://circleci.com/gh/Financial-Times/github-repositories-contents-search/tree/master">
+	<img alt="Build Status" src="https://circleci.com/gh/Financial-Times/github-repositories-contents-search/tree/master.svg?style=svg">
+</a>
 
----
+A command line tool that searches the contents of you GitHub repositories.
 
-To use this tool you will need
-a [GitHub personal access token](#github-personal-access-token-security)
-with all `repo` scopes.
+Ebi is [Japanese for prawn/shrimp](<[https://translate.google.com/#view=home&op=translate&sl=en&tl=ja&text=Prawn](https://translate.google.com/#en/ja/Prawn)>), and intends to be a small little tool to crawl through your sea of code on GitHub, finding you nuggets of information.
 
 ## Usage
 
-```
-$ <list_of_repositories> | ./bin/grcs.js <command>                        Search the contents of a list of repositories,
-                                                                          where <list_of_repositories> is a carriage
-									  return separated list of repositories in the
-									  format {owner}/{repository name}
-
-Commands:
-	./bin/grcs.js contents [--token=<token>] <file> <search>          Search the contents of a given file in a list of
-	                                                                  repositories for a given string
-									  Where <token> is your personal github token,
-									  <file> is the path of the file to be searched,
-									  and <search> is the string to search for
+**NOTE:** To use this tool you will need a [GitHub personal access token](#github-personal-access-token-security) with all `repo` scopes.
 
 ```
+$ <newline_separated_list_of_repositories> | ./bin/ebi.js <command>
+```
 
-### WIP: Current limitations
+### Examples
 
--   Only runs locally
--   Requires list of repositories to be piped in from `stdOut`
--   See associated issues for list of commands / options still to be implemented
+Show help
+
+    ./bin/ebi.js --help
+
+Determine whether a repo has a `Procfile`
+
+```
+$ echo -e "Financial-Times/next-search-page\nFinancial-Times/next-gdpr-tests" | ./bin/ebi.js --token $GITHUB_PERSONAL_ACCESS_TOKEN contents Procfile
+Financial-Times/next-search-page
+404 ERROR: file 'Procfile' not found in 'Financial-Times/next-gdpr-tests'
+```
+
+Find all the `node` engines and their versions in `package.json`
+
+```
+echo -e "Financial-Times/next-search-page\nFinancial-Times/next-gdpr-tests" | ./bin/ebi.js --token $GITHUB_PERSONAL_ACCESS_TOKEN package:engines
+Financial-Times/next-search-page	node@8.15.0
+Financial-Times/next-gdpr-tests	node@^8.9.4	npm@5.7.1
+```
 
 ## GitHub personal access token security
 

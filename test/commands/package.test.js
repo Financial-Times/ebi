@@ -60,7 +60,7 @@ describe('package command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
-	test('<search> value not found, does not log', async () => {
+	test('<search> value not found, logs info message in console error', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -69,7 +69,10 @@ describe('package command handler', () => {
 			path: 'package.json'
 		});
 		await packageHandler({ search: 'something-else' });
-		expect(console.log).not.toBeCalled();
+		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no match')
+		);
 	});
 });
 

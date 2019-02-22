@@ -27,6 +27,10 @@ exports.handler = function(argv) {
 			.then(contents => {
 				if (contents.includes(search)) {
 					console.log(repository);
+				} else {
+					console.error(
+						`INFO: '${path}' has no match for '${search}' in '${repository}'`
+					);
 				}
 			})
 			.catch(error => {

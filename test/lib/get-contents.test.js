@@ -1,5 +1,6 @@
 const nock = require('nock');
 
+const { base64Encode } = require('../helpers/base64');
 const getContents = require('../../lib/get-contents');
 const repo = 'Financial-Times/next-front-page';
 

@@ -1,32 +1,21 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
+const { withToken, withLimit } = require('./shared');
 
 exports.command = 'contents <file> [search]';
 
 exports.describe = 'Search within a repositories file';
 
 exports.builder = yargs => {
-	return yargs
+	return withToken(withLimit(yargs))
 		.positional('file', {
 			type: 'string',
 			describe: 'File path to search in GitHub contents API'
 		})
 		.positional('search', {
 			type: 'string',
-			describe:
-				'What to search for. If empty, returns whether the file exists or not'
-		})
-		.option('token', {
-			required: true,
-			type: 'string',
-			describe:
-				'GitHub personal access token. Generate one from https://github.com/settings/tokens'
-		})
-		.option('limit', {
-			required: false,
-			type: 'number',
-			describe: 'limit the number of repositories to search for'
+			describe: 'What to search for. If empty, returns all `engines`'
 		});
 };
 

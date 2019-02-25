@@ -29,7 +29,7 @@ describe('contents command handler', () => {
 	test('ignore empty strings', async () => {
 		createStandardInput('');
 
-		await contentsHandler({ file: 'Procfile', search: 'web' });
+		await contentsHandler({ filepath: 'Procfile', search: 'web' });
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
@@ -40,7 +40,7 @@ describe('contents command handler', () => {
 			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({ file: 'Procfile', search: 'web' });
+		await contentsHandler({ filepath: 'Procfile', search: 'web' });
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
@@ -48,7 +48,7 @@ describe('contents command handler', () => {
 		nockScope
 			.get(`/${repo}/contents/server`)
 			.reply(200, [{ path: 'app.js' }, { path: 'libs' }]);
-		await contentsHandler({ file: 'server', search: 'app' });
+		await contentsHandler({ filepath: 'server', search: 'app' });
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining(`'server' is not a file path`)
 		);
@@ -60,13 +60,13 @@ describe('contents command handler', () => {
 			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({ file: 'Procfile' });
+		await contentsHandler({ filepath: 'Procfile' });
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
 	test('logs error if file does not exist', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
-		await contentsHandler({ file: 'Procfile', search: 'something' });
+		await contentsHandler({ filepath: 'Procfile', search: 'something' });
 
 		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
 		expect(console.error).toBeCalledWith(
@@ -76,7 +76,7 @@ describe('contents command handler', () => {
 
 	test('logs error if file does not exist (with no search)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
-		await contentsHandler({ file: 'Procfile' });
+		await contentsHandler({ filepath: 'Procfile' });
 
 		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
 		expect(console.error).toBeCalledWith(
@@ -91,7 +91,7 @@ describe('contents command handler', () => {
 			path: 'Procfile'
 		});
 		await contentsHandler({
-			file: 'Procfile',
+			filepath: 'Procfile',
 			search: 'something-else'
 		});
 
@@ -127,7 +127,7 @@ describe.each([
 			});
 		});
 		await contentsHandler({
-			file: 'Procfile',
+			filepath: 'Procfile',
 			search: 'web',
 			limit: 2
 		});

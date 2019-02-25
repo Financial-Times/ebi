@@ -16,7 +16,16 @@
 		"type": "git",
 		"url": "git+https://github.com/Financial-Times/ebi.git"
 	},
-	"author": "Jennifer Johnson <jennifer.johnson@ft.com>",
+	"contributors": [
+		{
+			"name": "Jennifer Johnson",
+			"email": "jkerr321@gmail.com"
+		},
+		{
+			"name": "Tak Tran",
+			"email": "contact@tutaktran.com"
+		}
+	],
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/Financial-Times/ebi/issues"

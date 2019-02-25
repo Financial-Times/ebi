@@ -1,6 +1,5 @@
 const withLimit = yargs => {
 	return yargs.option('limit', {
-		required: true,
 		type: 'number',
 		describe: 'limit the number of repos to return to this number'
 	});

@@ -3,9 +3,7 @@
 	"version": "1.0.0",
 	"description": "Search repositories for their contents.",
 	"main": "index.js",
-	"bin": {
-		"ebi": "./bin/ebi.js"
-	},
+	"bin": "./bin/ebi.js",
 	"scripts": {
 		"lint": "eslint *.js src/ lib/ test/",
 		"lint-fix": "eslint --fix *.js src/ lib/ test/",

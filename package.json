@@ -2,7 +2,6 @@
 	"name": "ebi",
 	"version": "1.0.0",
 	"description": "Search repositories for their contents.",
-	"main": "index.js",
 	"bin": "./bin/ebi.js",
 	"scripts": {
 		"lint": "eslint *.js src/ lib/ test/",

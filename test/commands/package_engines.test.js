@@ -5,7 +5,7 @@ const createStandardInput = require('../helpers/create-standard-input');
 const { base64EncodeObj } = require('../helpers/base64');
 const {
 	handler: packageEnginesHandler
-} = require('../../src/commands/package_engines');
+} = require('../../src/commands/package-engines');
 const repo = 'Financial-Times/next-front-page';
 
 let nockScope;

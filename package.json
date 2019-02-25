@@ -1,5 +1,5 @@
 {
-	"name": "github-repositories-contents-search",
+	"name": "ebi",
 	"version": "1.0.0",
 	"description": "Search repositories for their contents.",
 	"main": "index.js",
@@ -14,14 +14,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Financial-Times/github-repositories-contents-search.git"
+		"url": "git+https://github.com/Financial-Times/ebi.git"
 	},
 	"author": "Jennifer Johnson <jennifer.johnson@ft.com>",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/Financial-Times/github-repositories-contents-search/issues"
+		"url": "https://github.com/Financial-Times/ebi/issues"
 	},
-	"homepage": "https://github.com/Financial-Times/github-repositories-contents-search#readme",
+	"homepage": "https://github.com/Financial-Times/ebi#readme",
 	"engines": {
 		"node": "10.15.0"
 	},

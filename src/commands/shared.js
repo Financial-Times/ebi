@@ -1,3 +1,5 @@
+const { GITHUB_PERSONAL_ACCESS_TOKEN } = process.env;
+
 const withLimit = yargs => {
 	return yargs.option('limit', {
 		type: 'number',
@@ -7,10 +9,11 @@ const withLimit = yargs => {
 
 const withToken = yargs => {
 	return yargs.option('token', {
-		required: true,
 		type: 'string',
+		// NOTE: Use a function here, so the token is not displayed in the command line
+		default: () => GITHUB_PERSONAL_ACCESS_TOKEN,
 		describe:
-			'GitHub personal access token. Generate one from https://github.com/settings/tokens'
+			'GitHub personal access token (uses `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable by default). Generate one from https://github.com/settings/tokens'
 	});
 };
 

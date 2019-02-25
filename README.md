@@ -58,4 +58,4 @@ This tool requires a [GitHub personal access token](https://help.github.com/arti
 This repo uses [prettier](https://prettier.io/) for code formatting. To make the most of this when working locally:
 
 -   Install the `prettier-vscode` extension in the extension side bar
--   Update your settings to format files on save, this will check your file meets the prettier guidelines and will fix it if it doesn't each time you save it. You can update the format on save setting at `Code` --> `Settings` --> update `"editor.formatOnSave": true`
+-   Update your settings to format files on save. This will check your file meets the prettier guidelines and will fix it each time you save. You can update the setting at `Code` --> `Preferences` --> `Settings` --> update `"editor.formatOnSave": true`

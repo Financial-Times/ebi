@@ -3,13 +3,13 @@ const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit } = require('./shared');
 
-exports.command = 'contents <file> [search]';
+exports.command = 'contents <filepath> [search]';
 
 exports.describe = 'Search within a repositories file';
 
 exports.builder = yargs => {
 	return withToken(withLimit(yargs))
-		.positional('file', {
+		.positional('filepath', {
 			type: 'string',
 			describe: 'File path to search in GitHub contents API'
 		})
@@ -20,16 +20,16 @@ exports.builder = yargs => {
 };
 
 exports.handler = argv => {
-	const { file: path, token, search, limit } = argv;
+	const { filepath, token, search, limit } = argv;
 
 	const repositories = getRepositories(limit);
 
 	const getPathContents = getContents({
 		githubToken: token,
-		path
+		filepath
 	});
 
-	// get the contents of <file> for each repository
+	// get the contents of <filepath> for each repository
 	const allRepos = repositories.map(repository =>
 		getPathContents(repository)
 			.then(contents => {
@@ -40,7 +40,7 @@ exports.handler = argv => {
 					return console.log(repository);
 				} else {
 					console.error(
-						`INFO: '${path}' has no match for '${search}' in '${repository}'`
+						`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
 					);
 				}
 			})

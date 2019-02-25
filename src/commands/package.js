@@ -16,11 +16,11 @@ exports.builder = yargs => {
 exports.handler = function(argv) {
 	const { token, search, limit } = argv;
 	const repositories = getRepositories(limit);
-	const path = 'package.json';
+	const filepath = 'package.json';
 
 	const getPackageJson = getContents({
 		githubToken: token,
-		path
+		filepath
 	});
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)
@@ -29,7 +29,7 @@ exports.handler = function(argv) {
 					console.log(repository);
 				} else {
 					console.error(
-						`INFO: '${path}' has no match for '${search}' in '${repository}'`
+						`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
 					);
 				}
 			})

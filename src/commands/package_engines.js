@@ -29,19 +29,19 @@ const enginesReport = engines => {
 
 exports.handler = function(argv = {}) {
 	const { token, limit, search } = argv;
-	const path = 'package.json';
+	const filepath = 'package.json';
 	const repositories = getRepositories(limit);
 
 	const getPackageJson = getContents({
 		githubToken: token,
-		path
+		filepath
 	});
 	const getJson = repository => data => {
 		try {
 			return processJson(data);
 		} catch (error) {
 			throw new Error(
-				`JSON PARSE ERROR: ${path} parse error in '${repository}'`
+				`JSON PARSE ERROR: ${filepath} parse error in '${repository}'`
 			);
 		}
 	};
@@ -49,7 +49,7 @@ exports.handler = function(argv = {}) {
 		const { engines } = json;
 		if (!engines) {
 			throw new Error(
-				`NOT FOUND: engines field not found in '${path}' in '${repository}'`
+				`NOT FOUND: engines field not found in '${filepath}' in '${repository}'`
 			);
 		}
 		return engines;
@@ -81,7 +81,7 @@ exports.handler = function(argv = {}) {
 					console.log(`${repository}\t${enginesOutput}`);
 				} else {
 					console.error(
-						`INFO: '${path}' has no match for '${search}' in '${repository}'`
+						`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
 					);
 				}
 			})

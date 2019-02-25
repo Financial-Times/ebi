@@ -10,37 +10,31 @@ Ebi is [Japanese for prawn/shrimp](<[https://translate.google.com/#view=home&op=
 
 ## Usage
 
-**NOTE:** To use this tool you will need a [GitHub personal access token](#github-personal-access-token-security) with all `repo` scopes.
+1.  [Set up a GitHub personal access token](#setting-up-your-github-personal-access-token) (with all `repo` scopes) assigned to the `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable
+2.  Get a new line separated list of repositories eg, `echo -e "Financial-Times/ebi"`, `cat repositories.txt` (with an existing list) or using [HTTPie](https://httpie.org/) + [Tako](https://github.com/Financial-Times/tako) + [jq](https://stedolan.github.io/jq/)
+3.  Pass in the list of repositories, using `|`, to the `ebi` tool:
 
-```
-$ <newline_separated_list_of_repositories> | ./bin/ebi.js <command>
-```
+        <list_of_repositories> | npx @financial-times/ebi <command>
 
 ### Examples
 
-Prerequisites
-
--   [Setting up your GitHub personal access token](#setting-up-your-github-personal-access-token)
-
 Show help
 
-    ./bin/ebi.js --help
+    npx @financial-times/ebi --help
 
 Determine whether a repo has a `Procfile`
 
 ```
-$ echo -e "Financial-Times/next-search-page\nFinancial-Times/next-gdpr-tests" | ./bin/ebi.js contents Procfile
-Financial-Times/next-search-page
-404 ERROR: file 'Procfile' not found in 'Financial-Times/next-gdpr-tests'
+$ echo -e "Financial-Times/ebi" | npx @financial-times/ebi contents Procfile
 ```
 
 Find all the `node` engines and their versions in `package.json`
 
 ```
-echo -e "Financial-Times/next-search-page\nFinancial-Times/next-gdpr-tests" | ./bin/ebi.js package:engines
-Financial-Times/next-search-page	node@8.15.0
-Financial-Times/next-gdpr-tests	node@^8.9.4	npm@5.7.1
+$ echo -e "Financial-Times/ebi" | npx @financial-times/ebi package:engines
 ```
+
+For more examples see [Usage Examples](https://github.com/Financial-Times/ebi/wiki/Usage-Examples).
 
 ## Setting up your GitHub personal access token
 
@@ -53,7 +47,24 @@ This tool requires a [GitHub personal access token](https://help.github.com/arti
     3. If all else fails, you can set it in your terminal with `GITHUB_PERSONAL_ACCESS_TOKEN=[github-token]`
     4. If you want use a different token, you can pass in `--token=$GITHUB_PERSONAL_ACCESS_TOKEN` when you run the commands
 
-## Code formatting with Prettier
+## Development
+
+1.  Install [nvm](https://github.com/creationix/nvm) and use the correct node version
+
+        nvm use
+
+1.  Install dependencies
+
+        npm install
+
+1.  Run with:
+
+        npx --package . ebi <command>
+
+        # or,
+        ./bin/ebi.js <command>
+
+### Code formatting with Prettier
 
 This repo uses [prettier](https://prettier.io/) for code formatting. To make the most of this when working locally:
 

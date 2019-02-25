@@ -1,5 +1,5 @@
 const withLimit = yargs => {
-	return yargs.option('token', {
+	return yargs.option('limit', {
 		required: true,
 		type: 'string',
 		describe:

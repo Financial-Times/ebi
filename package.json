@@ -7,7 +7,8 @@
 		"lint": "eslint *.js src/ lib/ test/",
 		"lint-fix": "eslint --fix *.js src/ lib/ test/",
 		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
-		"test": "npm run lint && jest"
+		"test": "npm run lint && npm run unit-test",
+		"unit-test": "jest"
 	},
 	"repository": {
 		"type": "git",

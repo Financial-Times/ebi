@@ -70,3 +70,13 @@ This repo uses [prettier](https://prettier.io/) for code formatting. To make the
 
 -   Install the `prettier-vscode` extension in the extension side bar
 -   Update your settings to format files on save. This will check your file meets the prettier guidelines and will fix it each time you save. You can update the setting at `Code` --> `Preferences` --> `Settings` --> update `"editor.formatOnSave": true`
+
+### Publishing a release
+
+CircleCI is set up to publish a release to `npm`. To release:
+
+1. Create a [new release from GitHub](https://github.com/Financial-Times/ebi/releases/new)
+    1. Tag it with a [semver](https://semver.org/) range and a `v` prefix eg, `v1.2.3` or `v1.4.5-beta.3`
+    2. Create a title and description
+    3. Publish release
+2. Wait for CircleCI to finish building the tag release, and once done, it will be appear at https://www.npmjs.com/@financial-times/ebi

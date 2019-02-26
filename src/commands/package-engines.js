@@ -49,7 +49,7 @@ exports.handler = function(argv = {}) {
 		const { engines } = json;
 		if (!engines) {
 			throw new Error(
-				`NOT FOUND: engines field not found in '${filepath}' in '${repository}'`
+				`INFO: engines field not found in '${filepath}' in '${repository}'`
 			);
 		}
 		return engines;

@@ -6,7 +6,7 @@
 
 A command line tool that searches the contents of you GitHub repositories.
 
-Ebi is [Japanese for prawn/shrimp](<[https://translate.google.com/#view=home&op=translate&sl=en&tl=ja&text=Prawn](https://translate.google.com/#en/ja/Prawn)>), and intends to be a small little tool to crawl through your sea of code on GitHub, finding you nuggets of information.
+Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=home&op=translate&sl=en&tl=ja&text=Prawn), and intends to be a small little tool to crawl through your sea of code on GitHub, finding you nuggets of information.
 
 ## Usage
 

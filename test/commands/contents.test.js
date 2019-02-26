@@ -100,6 +100,56 @@ describe('contents command handler', () => {
 			expect.stringContaining('no match')
 		);
 	});
+
+	test('regex is used for search', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			filepath: 'Procfile',
+			// NOTE: the extra \'s are not needed on the command line
+			regex: '\\d{3}\\.js$'
+		});
+
+		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is not matched, logs error', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			filepath: 'Procfile',
+			regex: 'something.js$'
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no regex match')
+		);
+		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is used if search term also exists', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			filepath: 'Procfile',
+			regex: 'something-else',
+			search: 'node'
+		});
+
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no regex match')
+		);
+	});
 });
 
 describe.each([

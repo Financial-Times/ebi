@@ -1,14 +1,14 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
-const { withToken, withLimit } = require('./shared');
+const { withToken, withLimit, withRegex } = require('./shared');
 
 exports.command = 'contents <filepath> [search]';
 
 exports.describe = 'Search within a repositories file';
 
 exports.builder = yargs => {
-	return withToken(withLimit(yargs))
+	return withRegex(withToken(withLimit(yargs)))
 		.positional('filepath', {
 			type: 'string',
 			describe: 'File path to search in GitHub contents API'
@@ -20,7 +20,7 @@ exports.builder = yargs => {
 };
 
 exports.handler = argv => {
-	const { filepath, token, search, limit } = argv;
+	const { filepath, token, search, regex, limit } = argv;
 
 	const repositories = getRepositories(limit);
 
@@ -36,7 +36,18 @@ exports.handler = argv => {
 				const noSearch = !search;
 				const containsSearchItem = contents.includes(search);
 
-				if (noSearch || containsSearchItem) {
+				if (regex) {
+					const regExp = new RegExp(regex);
+					const hasMatch = contents.match(regExp);
+
+					if (hasMatch) {
+						return console.log(repository);
+					} else {
+						console.error(
+							`INFO: '${filepath}' has no regex match for '${regExp}' in '${repository}'`
+						);
+					}
+				} else if (noSearch || containsSearchItem) {
 					return console.log(repository);
 				} else {
 					console.error(

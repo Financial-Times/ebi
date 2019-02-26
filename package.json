@@ -1,6 +1,6 @@
 {
 	"name": "ebi",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"description": "Search repositories for their contents.",
 	"bin": "./bin/ebi.js",
 	"scripts": {

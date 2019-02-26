@@ -17,4 +17,22 @@ const withToken = yargs => {
 	});
 };
 
-module.exports = { withLimit, withToken };
+const withRegex = yargs => {
+	return yargs
+		.option('regex', {
+			type: 'string',
+			describe: 'Regular expression to search by'
+		})
+		.check(({ regex, search }) => {
+			const regexExists = !!regex;
+			const searchExists = !!search;
+
+			if (regexExists && searchExists) {
+				throw new Error('Only use `search` or `regex`, not both');
+			}
+
+			return true;
+		});
+};
+
+module.exports = { withLimit, withToken, withRegex };

@@ -14,24 +14,24 @@ Ebi is [Japanese for prawn/shrimp](<[https://translate.google.com/#view=home&op=
 2.  Get a new line separated list of repositories eg, `echo -e "Financial-Times/ebi"`, `cat repositories.txt` (with an existing list) or using [HTTPie](https://httpie.org/) + [Tako](https://github.com/Financial-Times/tako) + [jq](https://stedolan.github.io/jq/)
 3.  Pass in the list of repositories, using `|`, to the `ebi` tool:
 
-        <list_of_repositories> | npx @financial-times/ebi <command>
+        <list_of_repositories> | npx ebi <command>
 
 ### Examples
 
 Show help
 
-    npx @financial-times/ebi --help
+    npx ebi --help
 
 Determine whether a repo has a `Procfile`
 
 ```
-$ echo -e "Financial-Times/ebi" | npx @financial-times/ebi contents Procfile
+$ echo -e "Financial-Times/ebi" | npx ebi contents Procfile
 ```
 
 Find all the `node` engines and their versions in `package.json`
 
 ```
-$ echo -e "Financial-Times/ebi" | npx @financial-times/ebi package:engines
+$ echo -e "Financial-Times/ebi" | npx ebi package:engines
 ```
 
 For more examples see [Usage Examples](https://github.com/Financial-Times/ebi/wiki/Usage-Examples).
@@ -79,4 +79,4 @@ CircleCI is set up to publish a release to `npm`. To release:
     1. Tag it with a [semver](https://semver.org/) range and a `v` prefix eg, `v1.2.3` or `v1.4.5-beta.3`
     2. Create a title and description
     3. Publish release
-2. Wait for CircleCI to finish building the tag release, and once done, it will be appear at https://www.npmjs.com/@financial-times/ebi
+2. Wait for CircleCI to finish building the tag release, and once done, it will be appear at [npmjs.com/package/ebi](https://www.npmjs.com/package/ebi)

@@ -1,14 +1,14 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
-const { withToken, withLimit } = require('./shared');
+const { withToken, withLimit, withRegex } = require('./shared');
 const { findMatchedKeyValuePairs } = require('../../lib/object-utils');
 
 exports.command = 'package:engines [search]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
 
 exports.builder = yargs => {
-	return withToken(withLimit(yargs)).positional('search', {
+	return withRegex(withToken(withLimit(yargs))).positional('search', {
 		type: 'string',
 		describe: 'What to search for. If empty, returns all `engines`'
 	});
@@ -46,8 +46,12 @@ const throwIfNoEngines = ({ filepath, repository }) => (json = {}) => {
 	return engines;
 };
 
-const filterSearch = search => engines => {
-	if (search) {
+const filterSearch = ({ search, regex }) => engines => {
+	if (regex) {
+		return findMatchedKeyValuePairs(engines, value => {
+			return value.match(new RegExp(regex));
+		});
+	} else if (search) {
 		return findMatchedKeyValuePairs(engines, value =>
 			value.includes(search)
 		);
@@ -57,7 +61,7 @@ const filterSearch = search => engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, limit, search } = argv;
+	const { token, limit, search, regex } = argv;
 	const filepath = 'package.json';
 	const repositories = getRepositories(limit);
 
@@ -69,7 +73,7 @@ exports.handler = function(argv = {}) {
 		getPackageJson(repository)
 			.then(getJson({ filepath, repository }))
 			.then(throwIfNoEngines({ filepath, repository }))
-			.then(filterSearch(search))
+			.then(filterSearch({ search, regex }))
 			.then(engines => {
 				const enginesOutput = enginesReport(engines);
 				const hasEngines = !!Object.keys(engines).length;
@@ -77,7 +81,8 @@ exports.handler = function(argv = {}) {
 					console.log(`${repository}\t${enginesOutput}`);
 				} else {
 					console.error(
-						`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
+						`INFO: '${filepath}' has no match for '${regex ||
+							search}' in '${repository}'`
 					);
 				}
 			})

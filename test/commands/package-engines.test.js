@@ -210,6 +210,81 @@ describe('package:engines command handler', () => {
 			expect.stringContaining('parse error')
 		);
 	});
+
+	test('regex is used for name search', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			regex: 'no.*'
+		});
+
+		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is used for version search', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			regex: '\\.15\\..*'
+		});
+
+		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is not matched, logs error', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			regex: 'something$'
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no match')
+		);
+		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is used if search term also exists', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({
+			regex: 'something-else',
+			search: 'node'
+		});
+
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no match')
+		);
+	});
 });
 
 describe.each([

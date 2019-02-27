@@ -27,6 +27,42 @@ const enginesReport = engines => {
 		.join('\t');
 };
 
+const getJson = ({ filepath, repository }) => data => {
+	try {
+		return processJson(data);
+	} catch (error) {
+		throw new Error(
+			`JSON PARSE ERROR: ${filepath} parse error in '${repository}'`
+		);
+	}
+};
+
+const throwIfNoEngines = ({ filepath, repository }) => (json = {}) => {
+	const { engines } = json;
+	if (!engines) {
+		throw new Error(
+			`INFO: engines field not found in '${filepath}' in '${repository}'`
+		);
+	}
+	return engines;
+};
+
+const filterSearch = search => engines => {
+	if (search) {
+		const foundKeys = Object.keys(engines).filter(name => {
+			return name.includes(search);
+		});
+		const engineNameSearch = pick(engines, foundKeys);
+		const engineVersionSearch = pickBy(engines, value => {
+			return value.includes(search);
+		});
+
+		return merge(engineNameSearch, engineVersionSearch);
+	} else {
+		return engines;
+	}
+};
+
 exports.handler = function(argv = {}) {
 	const { token, limit, search } = argv;
 	const filepath = 'package.json';
@@ -36,44 +72,11 @@ exports.handler = function(argv = {}) {
 		githubToken: token,
 		filepath
 	});
-	const getJson = repository => data => {
-		try {
-			return processJson(data);
-		} catch (error) {
-			throw new Error(
-				`JSON PARSE ERROR: ${filepath} parse error in '${repository}'`
-			);
-		}
-	};
-	const throwIfNoEngines = repository => (json = {}) => {
-		const { engines } = json;
-		if (!engines) {
-			throw new Error(
-				`INFO: engines field not found in '${filepath}' in '${repository}'`
-			);
-		}
-		return engines;
-	};
-	const filterSearch = engines => {
-		if (search) {
-			const foundKeys = Object.keys(engines).filter(name => {
-				return name.includes(search);
-			});
-			const engineNameSearch = pick(engines, foundKeys);
-			const engineVersionSearch = pickBy(engines, value => {
-				return value.includes(search);
-			});
-
-			return merge(engineNameSearch, engineVersionSearch);
-		} else {
-			return engines;
-		}
-	};
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)
-			.then(getJson(repository))
-			.then(throwIfNoEngines(repository))
-			.then(filterSearch)
+			.then(getJson({ filepath, repository }))
+			.then(throwIfNoEngines({ filepath, repository }))
+			.then(filterSearch(search))
 			.then(engines => {
 				const enginesOutput = enginesReport(engines);
 				const hasEngines = !!Object.keys(engines).length;

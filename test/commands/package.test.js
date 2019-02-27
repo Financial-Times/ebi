@@ -86,6 +86,59 @@ describe('package command handler', () => {
 			expect.stringContaining('no match')
 		);
 	});
+
+	test('regex is used for search', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				name: 'next-front-page'
+			}),
+			path: 'package.json'
+		});
+		await packageHandler({
+			// NOTE: the extra \'s are not needed on the command line
+			regex: 'front-.*$'
+		});
+
+		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is not matched, logs error', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				name: 'next-front-page'
+			}),
+			path: 'package.json'
+		});
+		await packageHandler({
+			regex: 'something$'
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no regex match')
+		);
+		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
+	});
+
+	test('regex is used if search term also exists', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				name: 'next-front-page'
+			}),
+			path: 'package.json'
+		});
+		await packageHandler({
+			regex: 'something-else',
+			search: 'front'
+		});
+
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('no regex match')
+		);
+	});
 });
 
 describe.each([

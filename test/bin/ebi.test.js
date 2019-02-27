@@ -9,4 +9,13 @@ describe('ebi command line', () => {
 			done();
 		});
 	});
+
+	it('throws error if package search has search term and regex', done => {
+		const command =
+			'echo "Financial-Times/ebi" | ./bin/ebi.js package --regex regex-term search-term';
+		exec(command, 'utf8', (err, stdout, stderr) => {
+			expect(stderr).toContain('use `search` or `regex`, not both');
+			done();
+		});
+	});
 });

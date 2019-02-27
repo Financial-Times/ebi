@@ -3,7 +3,7 @@ const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit } = require('./shared');
 
-exports.command = 'package <search>';
+exports.command = 'package [search]';
 exports.desc = 'Search within the `package.json` file';
 
 exports.builder = yargs => {
@@ -25,10 +25,13 @@ exports.handler = function(argv) {
 	const allRepos = repositories.map(repository =>
 		getPackageJson(repository)
 			.then(contents => {
-				if (contents.includes(search)) {
-					console.log(repository);
+				const noSearch = !search;
+				const containsSearchItem = contents.includes(search);
+
+				if (noSearch || containsSearchItem) {
+					return console.log(repository);
 				} else {
-					console.error(
+					return console.error(
 						`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
 					);
 				}

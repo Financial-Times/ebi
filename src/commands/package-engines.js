@@ -1,9 +1,8 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
-const { pick, pickBy, merge } = require('lodash');
-
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit } = require('./shared');
+const { findMatchedKeyValuePairs } = require('../../lib/object-utils');
 
 exports.command = 'package:engines [search]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
@@ -49,15 +48,9 @@ const throwIfNoEngines = ({ filepath, repository }) => (json = {}) => {
 
 const filterSearch = search => engines => {
 	if (search) {
-		const foundKeys = Object.keys(engines).filter(name => {
-			return name.includes(search);
-		});
-		const engineNameSearch = pick(engines, foundKeys);
-		const engineVersionSearch = pickBy(engines, value => {
-			return value.includes(search);
-		});
-
-		return merge(engineNameSearch, engineVersionSearch);
+		return findMatchedKeyValuePairs(engines, value =>
+			value.includes(search)
+		);
 	} else {
 		return engines;
 	}

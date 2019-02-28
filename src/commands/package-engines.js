@@ -6,6 +6,13 @@ const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit, withRegex } = require('./shared');
 const { findMatchedKeyValuePairs } = require('../../lib/object-utils');
 
+const {
+	createResult,
+	withMatch,
+	withErrorMessage
+} = require('../../lib/create-result');
+const { logText, logTextWithSuffix } = require('../../lib/log-result');
+
 exports.command = 'package:engines [search]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
 
@@ -72,27 +79,40 @@ exports.handler = function(argv = {}) {
 		githubToken: token,
 		filepath
 	});
-	const allRepos = repositories.map(repository =>
-		getPackageJson(repository)
+	const allRepos = repositories.map(repository => {
+		const result = createResult({
+			search,
+			regex,
+			filepath,
+			repository
+		});
+		return getPackageJson(repository)
 			.then(getJson({ filepath, repository }))
 			.then(throwIfNoEngines({ filepath, repository }))
 			.then(filterSearch({ search, regex }))
 			.then(engines => {
-				const enginesOutput = enginesReport(engines);
 				const hasEngines = !!Object.keys(engines).length;
+				let output;
 				if (hasEngines) {
-					console.log(`${repository}\t${enginesOutput}`);
+					output = result(withMatch({ engines }));
 				} else {
-					console.error(
-						`INFO: '${filepath}' has no match for '${regex ||
-							search}' in '${repository}'`
+					output = result(
+						withErrorMessage(
+							`INFO: '${filepath}' has no match for '${regex ||
+								search}' in '${repository}'`
+						)
 					);
 				}
+
+				return output;
 			})
+			.then(logTextWithSuffix(({ engines }) => enginesReport(engines)))
 			.catch(error => {
-				console.error(error.message);
-			})
-	);
+				const { message } = error;
+				const output = result(withErrorMessage(message));
+				return logText(output);
+			});
+	});
 
 	return Promise.all(allRepos);
 };

@@ -1,9 +1,14 @@
-/*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const { flow } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit, withRegex } = require('./shared');
+const {
+	createResult,
+	withMatchFileContents,
+	withErrorMessage
+} = require('../../lib/create-result');
+const { logText } = require('../../lib/log-result');
 
 exports.command = 'contents <filepath> [search]';
 
@@ -34,35 +39,51 @@ exports.handler = argv => {
 	});
 
 	// get the contents of <filepath> for each repository
-	const allRepos = repositories.map(repository =>
-		getPathContents(repository)
+	const allRepos = repositories.map(repository => {
+		const result = createResult({
+			search,
+			regex,
+			filepath,
+			repository
+		});
+		return getPathContents(repository)
 			.then(contents => {
 				const noSearch = !search;
 				const containsSearchItem = contents.includes(search);
+				let output;
 
 				if (regex) {
 					const regExp = new RegExp(regex);
 					const hasMatch = contents.match(regExp);
 
 					if (hasMatch) {
-						return console.log(repository);
+						output = result(withMatchFileContents(contents));
 					} else {
-						console.error(
-							`INFO: '${filepath}' has no match for '${regExp}' in '${repository}'`
+						output = result(
+							withErrorMessage(
+								`INFO: '${filepath}' has no match for '${regExp}' in '${repository}'`
+							)
 						);
 					}
 				} else if (noSearch || containsSearchItem) {
-					return console.log(repository);
+					output = result(withMatchFileContents(contents));
 				} else {
-					console.error(
-						`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
+					output = result(
+						withErrorMessage(
+							`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
+						)
 					);
 				}
+
+				return output;
 			})
+			.then(logText)
 			.catch(error => {
-				console.error(error.message);
-			})
-	);
+				const { message } = error;
+				const output = result(withErrorMessage(message));
+				return logText(output);
+			});
+	});
 
 	return Promise.all(allRepos);
 };

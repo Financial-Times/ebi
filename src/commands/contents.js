@@ -2,20 +2,20 @@ const { flow } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
-const { withToken, withLimit, withRegex } = require('./shared');
+const { withToken, withLimit, withRegex, withJson } = require('./shared');
 const {
 	createResult,
 	withMatchFileContents,
 	withErrorMessage
 } = require('../../lib/create-result');
-const { logText } = require('../../lib/log-result');
+const { logText, logJson } = require('../../lib/log-result');
 
 exports.command = 'contents <filepath> [search]';
 
 exports.describe = 'Search within a repositories file';
 
 exports.builder = yargs => {
-	const baseConfig = flow([withRegex, withToken, withLimit]);
+	const baseConfig = flow([withJson, withRegex, withToken, withLimit]);
 	return baseConfig(yargs)
 		.positional('filepath', {
 			type: 'string',
@@ -29,7 +29,7 @@ exports.builder = yargs => {
 };
 
 exports.handler = argv => {
-	const { filepath, token, search, regex, limit } = argv;
+	const { filepath, token, search, regex, limit, json } = argv;
 
 	const repositories = getRepositories(limit);
 
@@ -77,11 +77,11 @@ exports.handler = argv => {
 
 				return output;
 			})
-			.then(logText)
+			.then(result => (json ? logJson(result) : logText(result)))
 			.catch(error => {
 				const { message } = error;
 				const output = result(withErrorMessage(message));
-				return logText(output);
+				return json ? logJson(output) : logText(output);
 			});
 	});
 

@@ -117,7 +117,7 @@ describe('package command handler', () => {
 
 		expect(console.log).not.toBeCalled();
 		expect(console.error).toBeCalledWith(
-			expect.stringContaining('no regex match')
+			expect.stringContaining('no match')
 		);
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
 	});
@@ -136,7 +136,7 @@ describe('package command handler', () => {
 		});
 
 		expect(console.error).toBeCalledWith(
-			expect.stringContaining('no regex match')
+			expect.stringContaining('no match')
 		);
 	});
 });

@@ -45,7 +45,7 @@ exports.handler = argv => {
 						return console.log(repository);
 					} else {
 						console.error(
-							`INFO: '${filepath}' has no regex match for '${regExp}' in '${repository}'`
+							`INFO: '${filepath}' has no match for '${regExp}' in '${repository}'`
 						);
 					}
 				} else if (noSearch || containsSearchItem) {

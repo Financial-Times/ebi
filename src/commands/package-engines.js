@@ -3,7 +3,7 @@ const { flow } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
-const { withToken, withLimit, withRegex } = require('./shared');
+const { withToken, withLimit, withRegex, withJson } = require('./shared');
 const { findMatchedKeyValuePairs } = require('../../lib/object-utils');
 
 const {
@@ -11,13 +11,13 @@ const {
 	withMatch,
 	withErrorMessage
 } = require('../../lib/create-result');
-const { logText, logTextWithSuffix } = require('../../lib/log-result');
+const { logText, logTextWithSuffix, logJson } = require('../../lib/log-result');
 
 exports.command = 'package:engines [search]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
 
 exports.builder = yargs => {
-	const baseConfig = flow([withRegex, withToken, withLimit]);
+	const baseConfig = flow([withJson, withRegex, withToken, withLimit]);
 	return baseConfig(yargs).positional('search', {
 		type: 'string',
 		describe: 'What to search for. If empty, returns all `engines`'
@@ -71,22 +71,27 @@ const filterSearch = ({ search, regex }) => engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, limit, search, regex } = argv;
+	const { token, limit, search, regex, json } = argv;
 	const filepath = 'package.json';
 	const repositories = getRepositories(limit);
 
-	const getPackageJson = getContents({
+	const getPackageJsonFile = getContents({
 		githubToken: token,
 		filepath
 	});
 	const allRepos = repositories.map(repository => {
-		const result = createResult({
+		const baseResult = {
 			search,
 			regex,
 			filepath,
 			repository
-		});
-		return getPackageJson(repository)
+		};
+		let result = createResult(baseResult);
+		return getPackageJsonFile(repository)
+			.then(fileContents => {
+				result = createResult({ ...baseResult, fileContents });
+				return fileContents;
+			})
 			.then(getJson({ filepath, repository }))
 			.then(throwIfNoEngines({ filepath, repository }))
 			.then(filterSearch({ search, regex }))
@@ -106,11 +111,19 @@ exports.handler = function(argv = {}) {
 
 				return output;
 			})
-			.then(logTextWithSuffix(({ engines }) => enginesReport(engines)))
+			.then(result => {
+				if (json) {
+					return logJson(result);
+				} else {
+					return logTextWithSuffix(({ engines }) =>
+						enginesReport(engines)
+					)(result);
+				}
+			})
 			.catch(error => {
 				const { message } = error;
 				const output = result(withErrorMessage(message));
-				return logText(output);
+				return json ? logJson(output) : logText(output);
 			});
 	});
 

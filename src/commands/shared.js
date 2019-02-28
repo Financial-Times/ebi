@@ -35,4 +35,12 @@ const withRegex = yargs => {
 		});
 };
 
-module.exports = { withLimit, withToken, withRegex };
+const withJson = yargs => {
+	return yargs.option('json', {
+		type: 'boolean',
+		default: false,
+		describe: 'Output JSON (including errors)'
+	});
+};
+
+module.exports = { withLimit, withToken, withRegex, withJson };

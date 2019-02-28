@@ -36,6 +36,34 @@ $ echo -e "Financial-Times/ebi" | npx ebi package:engines
 
 For more examples see [Usage Examples](https://github.com/Financial-Times/ebi/wiki/Usage-Examples).
 
+### JSON output
+
+To output as JSON, you can use the `--json` flag eg, `npx ebi package:engines --json`.
+
+The output format of the JSON is
+
+```
+{
+    type,
+    repository,
+    filepath,
+    fileContents,
+    [search],
+    [regex],
+    [error]
+}
+```
+
+| Field          | Values                            | Description                                                   |
+| -------------- | --------------------------------- | ------------------------------------------------------------- |
+| `type`         | `match`, `error`                  | Type of result. Non matches will be under `error`             |
+| `repository`   | `Financial-Times/ebi`             | The full repository path                                      |
+| `filepath`     | `package.json`                    | The filepath searched for                                     |
+| `fileContents` | `{\n  \"name\": \"ebi\",\n ... }` | The file contents serialized as a string                      |
+| `search`       | `name`                            | [optional] The search term                                    |
+| `regex`        | `no.*`                            | [optional] The regex used for search (ie, `--regex`)          |
+| `error`        | `404 ERROR: ...`                  | [optional] The error message if the result is of type `error` |
+
 ## Setting up your GitHub personal access token
 
 This tool requires a [GitHub personal access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) with all `repo` scopes. This is _very powerful_ as it has access to modify a repository's settings, so it is strongly recommended that you store this token securely.

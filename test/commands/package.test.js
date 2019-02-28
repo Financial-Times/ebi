@@ -141,6 +141,82 @@ describe('package command handler', () => {
 	});
 });
 
+describe('json output', () => {
+	let packageJson;
+	beforeEach(() => {
+		packageJson = {
+			name: 'next-front-page'
+		};
+	});
+
+	test('shows json', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+		await packageHandler({ json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'package.json',
+			repository: repo,
+			fileContents: JSON.stringify(packageJson)
+		});
+	});
+
+	test('shows json with search', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+		await packageHandler({ search: 'name', json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'package.json',
+			search: 'name',
+			repository: repo,
+			fileContents: JSON.stringify(packageJson)
+		});
+	});
+
+	test('shows json with regex', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+		await packageHandler({ regex: 'front-.*', json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'package.json',
+			regex: 'front-.*',
+			repository: repo,
+			fileContents: JSON.stringify(packageJson)
+		});
+	});
+
+	test('shows json error', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(404);
+		await packageHandler({ search: 'something', json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'error',
+			filepath: 'package.json',
+			repository: repo,
+			search: 'something',
+			error: expect.stringContaining('not found')
+		});
+	});
+});
+
 describe.each([
 	[
 		[

@@ -287,6 +287,86 @@ describe('package:engines command handler', () => {
 	});
 });
 
+describe('json output', () => {
+	let packageJson;
+	beforeEach(() => {
+		packageJson = {
+			engines: {
+				node: '~10.15.0'
+			}
+		};
+	});
+
+	test('shows json', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({ json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'package.json',
+			engines: packageJson.engines,
+			fileContents: JSON.stringify(packageJson),
+			repository: repo
+		});
+	});
+
+	test('shows json with search', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({ json: true, search: 'node' });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'package.json',
+			search: 'node',
+			engines: packageJson.engines,
+			fileContents: JSON.stringify(packageJson),
+			repository: repo
+		});
+	});
+
+	test('shows json with regex', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+		await packageEnginesHandler({ json: true, regex: 'no.*' });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'package.json',
+			regex: 'no.*',
+			engines: packageJson.engines,
+			fileContents: JSON.stringify(packageJson),
+			repository: repo
+		});
+	});
+
+	test('shows json with error', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(404);
+		await packageEnginesHandler({ json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'error',
+			filepath: 'package.json',
+			repository: repo,
+			error: expect.stringContaining('not found')
+		});
+	});
+});
+
 describe.each([
 	[
 		[

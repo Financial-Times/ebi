@@ -152,6 +152,85 @@ describe('contents command handler', () => {
 	});
 });
 
+describe('json output', () => {
+	test('shows json', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			json: true,
+			filepath: 'Procfile'
+		});
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'Procfile',
+			repository: repo,
+			fileContents: 'web: node 1234.js'
+		});
+	});
+
+	test('shows json with search', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			json: true,
+			filepath: 'Procfile',
+			search: 'node'
+		});
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'Procfile',
+			search: 'node',
+			repository: repo,
+			fileContents: 'web: node 1234.js'
+		});
+	});
+
+	test('shows json with regex', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			json: true,
+			filepath: 'Procfile',
+			regex: 'node'
+		});
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'match',
+			filepath: 'Procfile',
+			regex: 'node',
+			repository: repo,
+			fileContents: 'web: node 1234.js'
+		});
+	});
+
+	test('shows json error', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
+		await contentsHandler({ filepath: 'Procfile', json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'error',
+			filepath: 'Procfile',
+			repository: repo,
+			error: expect.stringContaining('not found')
+		});
+	});
+});
+
 describe.each([
 	[
 		[

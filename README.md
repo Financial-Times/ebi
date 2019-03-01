@@ -4,7 +4,7 @@
 	<img alt="Build Status" src="https://circleci.com/gh/Financial-Times/ebi/tree/master.svg?style=svg">
 </a>
 
-A command line tool that searches the contents of you GitHub repositories.
+A command line tool that searches files within GitHub repositories.
 
 Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=home&op=translate&sl=en&tl=ja&text=Prawn), and intends to be a small little tool to crawl through your sea of code on GitHub, finding you nuggets of information.
 

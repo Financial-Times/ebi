@@ -18,7 +18,7 @@ const { logText, logJson } = require('../../lib/log-result');
 
 exports.command = 'contents <filepath> [search]';
 
-exports.describe = 'Search within a repositories file';
+exports.describe = 'Search a file within a repository';
 
 exports.builder = yargs => {
 	const baseConfig = flow([

@@ -1,7 +1,7 @@
 {
 	"name": "ebi",
 	"version": "0.0.0",
-	"description": "Search repositories for their contents.",
+	"description": "A command line tool that searches files within GitHub repositories",
 	"bin": "./bin/ebi.js",
 	"scripts": {
 		"lint": "eslint *.js src/ lib/ test/",

@@ -15,7 +15,8 @@ exports.builder = yargs => {
 		})
 		.positional('search', {
 			type: 'string',
-			describe: 'What to search for. If empty, returns all `engines`'
+			describe:
+				'What to search for. If empty, returns whether the file exists or not'
 		});
 };
 

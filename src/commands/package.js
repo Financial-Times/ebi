@@ -9,7 +9,8 @@ exports.desc = 'Search within the `package.json` file';
 exports.builder = yargs => {
 	return withRegex(withToken(withLimit(yargs))).positional('search', {
 		type: 'string',
-		describe: 'What to search for'
+		describe:
+			'What to search for. If empty returns whether `package.json` exists or not'
 	});
 };
 

@@ -1,4 +1,6 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
+const { flow } = require('lodash');
+
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit, withRegex } = require('./shared');
@@ -8,7 +10,8 @@ exports.command = 'contents <filepath> [search]';
 exports.describe = 'Search within a repositories file';
 
 exports.builder = yargs => {
-	return withRegex(withToken(withLimit(yargs)))
+	const baseConfig = flow([withRegex, withToken, withLimit]);
+	return baseConfig(yargs)
 		.positional('filepath', {
 			type: 'string',
 			describe: 'File path to search in GitHub contents API'

@@ -1,4 +1,6 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
+const { flow } = require('lodash');
+
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
 const { withToken, withLimit, withRegex } = require('./shared');
@@ -7,7 +9,8 @@ exports.command = 'package [search]';
 exports.desc = 'Search within the `package.json` file';
 
 exports.builder = yargs => {
-	return withRegex(withToken(withLimit(yargs))).positional('search', {
+	const baseConfig = flow([withRegex, withToken, withLimit]);
+	return baseConfig(yargs).positional('search', {
 		type: 'string',
 		describe:
 			'What to search for. If empty returns whether `package.json` exists or not'

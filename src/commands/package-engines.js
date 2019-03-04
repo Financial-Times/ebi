@@ -85,7 +85,7 @@ const filterSearch = ({ search, regex }) => engines => {
 exports.handler = function(argv = {}) {
 	const { token, limit, search, regex, json } = argv;
 	const filepath = 'package.json';
-	const repositories = getRepositories(limit);
+	const { repositories } = getRepositories(limit);
 
 	const getPackageJsonFile = getContents({
 		githubToken: token,

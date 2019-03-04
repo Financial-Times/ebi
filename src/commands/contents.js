@@ -43,7 +43,7 @@ exports.builder = yargs => {
 exports.handler = argv => {
 	const { filepath, token, search, regex, limit, json } = argv;
 
-	const repositories = getRepositories(limit);
+	const { repositories } = getRepositories(limit);
 
 	const getPathContents = getContents({
 		githubToken: token,

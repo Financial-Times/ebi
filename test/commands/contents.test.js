@@ -7,9 +7,10 @@ const { handler: contentsHandler } = require('../../src/commands/contents');
 const repo = 'Financial-Times/next-front-page';
 
 let nockScope;
+let standardInput;
 
 beforeEach(() => {
-	createStandardInput(repo);
+	standardInput = createStandardInput(repo);
 	nockScope = nock('https://api.github.com/repos');
 	// NB comment out this spy on console.error if you want to see errors during your tests
 	jest.spyOn(console, 'error')
@@ -23,6 +24,7 @@ beforeEach(() => {
 afterEach(() => {
 	nock.cleanAll();
 	jest.resetAllMocks();
+	standardInput.teardown();
 });
 
 describe('contents command handler', () => {

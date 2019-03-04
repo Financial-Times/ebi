@@ -85,12 +85,26 @@ const filterSearch = ({ search, regex }) => engines => {
 exports.handler = function(argv = {}) {
 	const { token, limit, search, regex, json } = argv;
 	const filepath = 'package.json';
-	const { repositories } = getRepositories(limit);
+	const { errors, repositories } = getRepositories(limit);
 
 	const getPackageJsonFile = getContents({
 		githubToken: token,
 		filepath
 	});
+
+	errors.forEach(error => {
+		const { repository, line } = error;
+		const result = createResult({
+			search,
+			regex,
+			filepath,
+			repository
+		});
+		const message = `ERROR: invalid repository '${repository}' on line ${line}`;
+		const output = result(withErrorMessage(message));
+		return json ? logJson(output) : logText(output);
+	});
+
 	const allRepos = repositories.map(repository => {
 		const baseResult = {
 			search,

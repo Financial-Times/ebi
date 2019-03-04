@@ -29,11 +29,37 @@ afterEach(() => {
 	standardInput.teardown();
 });
 
+describe('Log error for invalid repository', () => {
+	const invalidRepository = 'something-invalid';
+
+	test(`'${invalidRepository}'`, async () => {
+		standardInput = createStandardInput(invalidRepository);
+		await packageEnginesHandler();
+
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('invalid repository')
+		);
+	});
+
+	test(`'${invalidRepository}' in json`, async () => {
+		standardInput = createStandardInput(invalidRepository);
+		await packageEnginesHandler({ json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'error',
+			filepath: 'package.json',
+			repository: invalidRepository,
+			error: expect.stringContaining('invalid repository')
+		});
+	});
+});
+
 describe('package:engines command handler', () => {
-	test('ignore empty strings', async () => {
+	test('ignore empty string repositories', async () => {
 		createStandardInput('');
 
-		await packageEnginesHandler();
+		await packageEnginesHandler({});
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});

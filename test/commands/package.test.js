@@ -27,8 +27,35 @@ afterEach(() => {
 	standardInput.teardown();
 });
 
+describe('Log error for invalid repository', () => {
+	const invalidRepository = 'something-invalid';
+
+	test(`'${invalidRepository}'`, async () => {
+		createStandardInput(invalidRepository);
+		await packageHandler({ search: 'something' });
+
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('invalid repository')
+		);
+	});
+
+	test(`'${invalidRepository}' in json`, async () => {
+		createStandardInput(invalidRepository);
+		await packageHandler({ search: 'something', json: true });
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'error',
+			filepath: 'package.json',
+			search: 'something',
+			repository: invalidRepository,
+			error: expect.stringContaining('invalid repository')
+		});
+	});
+});
+
 describe('package command handler', () => {
-	test('ignore empty strings', async () => {
+	test('ignore empty string repositories', async () => {
 		createStandardInput('');
 
 		await packageHandler({ search: 'something' });

@@ -27,8 +27,42 @@ afterEach(() => {
 	standardInput.teardown();
 });
 
+describe('Log error for invalid repository', () => {
+	const invalidRepository = 'something-invalid';
+
+	test(`'${invalidRepository}'`, async () => {
+		createStandardInput(invalidRepository);
+		await contentsHandler({
+			filepath: 'Procfile',
+			search: 'node'
+		});
+
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining('invalid repository')
+		);
+	});
+
+	test(`'${invalidRepository}' in json`, async () => {
+		createStandardInput(invalidRepository);
+		await contentsHandler({
+			filepath: 'Procfile',
+			search: 'node',
+			json: true
+		});
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'error',
+			filepath: 'Procfile',
+			search: 'node',
+			repository: invalidRepository,
+			error: expect.stringContaining('invalid repository')
+		});
+	});
+});
+
 describe('contents command handler', () => {
-	test('ignore empty strings', async () => {
+	test('ignore empty string repositories', async () => {
 		createStandardInput('');
 
 		await contentsHandler({ filepath: 'Procfile', search: 'web' });

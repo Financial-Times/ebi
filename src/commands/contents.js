@@ -40,7 +40,7 @@ exports.builder = yargs => {
 		});
 };
 
-exports.handler = argv => {
+exports.handler = (argv = {}) => {
 	const { filepath, token, search, regex, limit, json } = argv;
 
 	const { repositories } = getRepositories(limit);

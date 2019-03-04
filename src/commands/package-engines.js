@@ -3,7 +3,13 @@ const { flow } = require('lodash');
 
 const getContents = require('../../lib/get-contents');
 const getRepositories = require('../../lib/get-repositories');
-const { withToken, withLimit, withRegex, withJson } = require('./shared');
+const {
+	withEpilogue,
+	withToken,
+	withLimit,
+	withRegex,
+	withJson
+} = require('./shared');
 const { findMatchedKeyValuePairs } = require('../../lib/object-utils');
 
 const {
@@ -17,7 +23,13 @@ exports.command = 'package:engines [search]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
 
 exports.builder = yargs => {
-	const baseConfig = flow([withJson, withRegex, withToken, withLimit]);
+	const baseConfig = flow([
+		withEpilogue,
+		withJson,
+		withRegex,
+		withToken,
+		withLimit
+	]);
 	return baseConfig(yargs).positional('search', {
 		type: 'string',
 		describe: 'What to search for. If empty, returns all `engines`'

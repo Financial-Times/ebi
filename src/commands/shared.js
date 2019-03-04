@@ -1,5 +1,11 @@
 const { GITHUB_PERSONAL_ACCESS_TOKEN } = process.env;
 
+const withEpilogue = yargs => {
+	return yargs.epilogue(
+		`NOTE: All commands require repositories to be piped into the command, where repositories are in the format '<owner>/<repository-name>'. For usage examples see https://github.com/Financial-Times/ebi/wiki/Usage-Examples`
+	);
+};
+
 const withLimit = yargs => {
 	return yargs.option('limit', {
 		type: 'number',
@@ -43,4 +49,4 @@ const withJson = yargs => {
 	});
 };
 
-module.exports = { withLimit, withToken, withRegex, withJson };
+module.exports = { withEpilogue, withLimit, withToken, withRegex, withJson };

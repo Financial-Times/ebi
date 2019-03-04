@@ -5,21 +5,25 @@ describe('getRepositories', () => {
 	test('no input', () => {
 		createStandardInput();
 
-		const repos = getRepositories();
-		expect(repos).toEqual([]);
+		const { repositories } = getRepositories();
+		expect(repositories).toEqual([]);
 	});
 
 	test('works for single repository', () => {
 		createStandardInput('something');
 
-		const [repository] = getRepositories();
+		const {
+			repositories: [repository]
+		} = getRepositories();
 		expect(repository).toEqual('something');
 	});
 
 	test('splits by newline', () => {
 		createStandardInput('something\nsomething-else');
 
-		const [firstRepo, secondRepo] = getRepositories();
+		const {
+			repositories: [firstRepo, secondRepo]
+		} = getRepositories();
 		expect(firstRepo).toEqual('something');
 		expect(secondRepo).toEqual('something-else');
 	});
@@ -27,7 +31,7 @@ describe('getRepositories', () => {
 	test('ignores empty lines', () => {
 		createStandardInput('something\n\n');
 
-		const repos = getRepositories();
-		expect(repos).toHaveLength(1);
+		const { repositories } = getRepositories();
+		expect(repositories).toHaveLength(1);
 	});
 });

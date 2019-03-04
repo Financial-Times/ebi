@@ -36,7 +36,7 @@ exports.builder = yargs => {
 	});
 };
 
-exports.handler = function(argv) {
+exports.handler = function(argv = {}) {
 	const { token, search, limit, regex, json } = argv;
 	const { repositories } = getRepositories(limit);
 	const filepath = 'package.json';

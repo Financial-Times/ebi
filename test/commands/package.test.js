@@ -36,6 +36,13 @@ describe('package command handler', () => {
 		expect(console.error).not.toBeCalled();
 	});
 
+	test('no arguments does nothing', async () => {
+		createStandardInput('');
+		await packageHandler();
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+
 	test('repository not found', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
 		standardInput = createStandardInput(invalidRepo);

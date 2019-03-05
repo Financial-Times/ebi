@@ -87,6 +87,21 @@ describe('contents command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
+	test.only('when contents handler is called with valid <file> and <search> and <repo list> values, a list of repositories are logged', async () => {
+		createStandardInput('');
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: n-cluster server/init.js'),
+			path: 'Procfile'
+		});
+		await contentsHandler({
+			filepath: 'Procfile',
+			search: 'web',
+			repoList: ['Financial-Times/next-front-page']
+		});
+		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
+	});
+
 	test('when `contents` command is used with an invalid <file> filepath, the relevant error is logged', async () => {
 		nockScope
 			.get(`/${repo}/contents/server`)

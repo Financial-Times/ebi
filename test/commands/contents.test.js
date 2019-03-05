@@ -87,7 +87,7 @@ describe('contents command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
-	test.only('when contents handler is called with valid <file> and <search> and <repo list> values, a list of repositories are logged', async () => {
+	test('when contents handler is called with valid <file> and <search> and <repo list> values, a list of repositories are logged', async () => {
 		createStandardInput('');
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',

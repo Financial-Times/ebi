@@ -45,6 +45,9 @@ typings/
 # Optional eslint cache
 .eslintcache
 
+# VSCode settings
+.vscode/
+
 # Optional REPL history
 .node_repl_history
 

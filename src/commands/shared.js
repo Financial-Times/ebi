@@ -49,4 +49,18 @@ const withJson = yargs => {
 	});
 };
 
-module.exports = { withEpilogue, withLimit, withToken, withRegex, withJson };
+const withRepoList = yargs => {
+	return yargs.option('repoList', {
+		type: 'string',
+		describe: 'Space-separated list of repos to search within'
+	});
+};
+
+module.exports = {
+	withEpilogue,
+	withLimit,
+	withToken,
+	withRegex,
+	withJson,
+	withRepoList
+};

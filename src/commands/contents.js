@@ -7,7 +7,8 @@ const {
 	withToken,
 	withLimit,
 	withRegex,
-	withJson
+	withJson,
+	withRepoList
 } = require('./shared');
 const {
 	createResult,
@@ -26,7 +27,8 @@ exports.builder = yargs => {
 		withJson,
 		withRegex,
 		withToken,
-		withLimit
+		withLimit,
+		withRepoList
 	]);
 	return baseConfig(yargs)
 		.positional('filepath', {

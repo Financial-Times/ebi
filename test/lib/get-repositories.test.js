@@ -10,14 +10,14 @@ describe.each`
 	test(`has no repository`, () => {
 		createStandardInput(input);
 
-		const { repositories } = getRepositories();
+		const { repositories } = getRepositories({});
 		expect(repositories).toEqual([]);
 	});
 
 	test(`has no error`, () => {
 		createStandardInput(input);
 
-		const { errors } = getRepositories();
+		const { errors } = getRepositories({});
 		expect(errors).toEqual([]);
 	});
 });
@@ -28,7 +28,7 @@ describe('getRepositories', () => {
 
 		const {
 			repositories: [repository]
-		} = getRepositories();
+		} = getRepositories({});
 		expect(repository).toEqual('Financial-Times/something');
 	});
 
@@ -39,7 +39,7 @@ describe('getRepositories', () => {
 
 		const {
 			repositories: [firstRepo, secondRepo]
-		} = getRepositories();
+		} = getRepositories({});
 		expect(firstRepo).toEqual('Financial-Times/something');
 		expect(secondRepo).toEqual('Financial-Times/something-else');
 	});
@@ -47,16 +47,22 @@ describe('getRepositories', () => {
 	test('ignores empty lines', () => {
 		createStandardInput('Financial-Times/something\n\n');
 
-		const { repositories } = getRepositories();
+		const { repositories } = getRepositories({});
 		expect(repositories).toHaveLength(1);
 	});
 
 	test('filters repos that are in the wrong format', () => {
 		createStandardInput('something');
 
-		const { repositories } = getRepositories();
+		const { repositories } = getRepositories({});
 		expect(repositories).toHaveLength(0);
 	});
+
+	// test('providing stdin and repoList arg produces error', () => {
+	// 	createStandardInput('Financial-Times/something');
+
+	// 	expect(() => getRepositories('Financial-Times/something')).toThrowError('choose one of ...')
+	// })
 });
 
 describe.each`
@@ -72,7 +78,7 @@ describe.each`
 	test(`returns error`, () => {
 		createStandardInput(input);
 
-		const { errors } = getRepositories();
+		const { errors } = getRepositories({});
 		expect(errors).toEqual(expectedErrors);
 	});
 });

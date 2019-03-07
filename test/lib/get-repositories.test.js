@@ -1,6 +1,10 @@
 const createStandardInput = require('../helpers/create-standard-input');
 const getRepositories = require('../../lib/get-repositories');
 
+afterEach(() => {
+	jest.resetAllMocks();
+});
+
 describe.each`
 	input
 	${undefined}
@@ -60,6 +64,13 @@ describe('getRepositories', () => {
 
 		const { repositories } = getRepositories({});
 		expect(repositories).toHaveLength(0);
+	});
+
+	test('takes repoList as an arg to provide repo array', () => {
+		const { repositories } = getRepositories({
+			repoList: ['Financial-Times/something']
+		});
+		expect(repositories).toHaveLength(1);
 	});
 
 	test('providing stdin and repoList arg produces error', () => {

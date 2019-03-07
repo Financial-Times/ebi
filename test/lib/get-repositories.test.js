@@ -67,10 +67,23 @@ describe('getRepositories', () => {
 	});
 
 	test('takes repoList as an arg to provide repo array', () => {
+		process.stdin.isTTY = true;
 		const { repositories } = getRepositories({
 			repoList: ['Financial-Times/something']
 		});
 		expect(repositories).toHaveLength(1);
+		process.stdin.isTTY = false;
+	});
+
+	test('takes empty repoList as an arg and uses piped content', () => {
+		createStandardInput('Financial-Times/something');
+
+		const {
+			repositories: [repository]
+		} = getRepositories({
+			repoList: []
+		});
+		expect(repository).toEqual('Financial-Times/something');
 	});
 
 	test('providing stdin and repoList arg produces error', () => {

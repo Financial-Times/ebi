@@ -62,11 +62,15 @@ describe('getRepositories', () => {
 		expect(repositories).toHaveLength(0);
 	});
 
-	// test('providing stdin and repoList arg produces error', () => {
-	// 	createStandardInput('Financial-Times/something');
+	test('providing stdin and repoList arg produces error', () => {
+		createStandardInput('Financial-Times/something');
 
-	// 	expect(() => getRepositories('Financial-Times/something')).toThrowError('choose one of ...')
-	// })
+		expect(() =>
+			getRepositories({ repoList: ['Financial-Times/something'] })
+		).toThrowError(
+			'choose either to pipe through a repo list OR pass it as args'
+		);
+	});
 });
 
 describe.each`

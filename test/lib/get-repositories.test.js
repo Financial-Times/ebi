@@ -23,6 +23,10 @@ describe.each`
 });
 
 describe('getRepositories', () => {
+	test('can run with no arguments', () => {
+		expect(() => getRepositories()).not.toThrow();
+	});
+
 	test('works for single repository', () => {
 		createStandardInput('Financial-Times/something');
 

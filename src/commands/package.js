@@ -8,7 +8,8 @@ const {
 	withToken,
 	withLimit,
 	withRegex,
-	withJson
+	withJson,
+	withRepoList
 } = require('./shared');
 
 const {
@@ -27,7 +28,8 @@ exports.builder = yargs => {
 		withJson,
 		withRegex,
 		withToken,
-		withLimit
+		withLimit,
+		withRepoList
 	]);
 	return baseConfig(yargs).positional('search', {
 		type: 'string',
@@ -37,8 +39,8 @@ exports.builder = yargs => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, search, limit, regex, json } = argv;
-	const { errors, repositories } = getRepositories({ limit });
+	const { token, search, limit, regex, json, repoList } = argv;
+	const { errors, repositories } = getRepositories({ limit, repoList });
 	const filepath = 'package.json';
 
 	const getPackageJson = getContents({

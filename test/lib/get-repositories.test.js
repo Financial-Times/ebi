@@ -40,6 +40,15 @@ describe('getRepositories', () => {
 		expect(repository).toEqual('Financial-Times/something');
 	});
 
+	test('works for full github repository links', () => {
+		createStandardInput('https://github.com/Financial-Times/something.git');
+
+		const {
+			repositories: [repository]
+		} = getRepositories();
+		expect(repository).toEqual('Financial-Times/something');
+	});
+
 	test('splits by newline', () => {
 		createStandardInput(
 			'Financial-Times/something\nFinancial-Times/something-else'
@@ -103,7 +112,6 @@ describe.each`
 	${'/'}                                          | ${[{ repository: '/', line: 1 }]}
 	${'something/'}                                 | ${[{ repository: 'something/', line: 1 }]}
 	${'/something'}                                 | ${[{ repository: '/something', line: 1 }]}
-	${'something/something/'}                       | ${[{ repository: 'something/something/', line: 1 }]}
 	${'/something/something'}                       | ${[{ repository: '/something/something', line: 1 }]}
 	${'owner/good1\nbad-one\nowner/good2\nbad-two'} | ${[{ repository: 'bad-one', line: 2 }, { repository: 'bad-two', line: 4 }]}
 `(`getRepositories errors for '$input'`, ({ input, expectedErrors }) => {

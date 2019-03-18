@@ -17,11 +17,15 @@
 	"contributors": [
 		{
 			"name": "Jennifer Johnson",
-			"email": "jkerr321@gmail.com"
+			"email": "jennifer.johnson@ft.com"
+		},
+		{
+			"name": "Jennifer Shepherd",
+			"email": "jennifer.shepherd@ft.com"
 		},
 		{
 			"name": "Tak Tran",
-			"email": "contact@tutaktran.com"
+			"email": "tak.tran@ft.com"
 		}
 	],
 	"license": "MIT",

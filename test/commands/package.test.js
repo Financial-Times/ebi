@@ -70,21 +70,6 @@ describe('package command handler', () => {
 		expect(console.error).not.toBeCalled();
 	});
 
-	test('repoList argument returns search results', async () => {
-		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
-			type: 'file',
-			content: base64EncodeObj({
-				name: 'next-front-page'
-			}),
-			path: 'package.json'
-		});
-		await packageHandler({
-			search: 'name',
-			repoList: repo
-		});
-		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
-	});
-
 	test('repository not found', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
 		standardInput = createStandardInput(invalidRepo);
@@ -106,6 +91,21 @@ describe('package command handler', () => {
 			path: 'package.json'
 		});
 		await packageHandler({ search: 'name' });
+		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
+	});
+
+	test('when given <repoList> argument, logs found repository', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				name: 'next-front-page'
+			}),
+			path: 'package.json'
+		});
+		await packageHandler({
+			search: 'name',
+			repoList: repo
+		});
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 

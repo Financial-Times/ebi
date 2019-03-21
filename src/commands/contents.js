@@ -17,7 +17,7 @@ const {
 } = require('../../lib/create-result');
 const { logText, logJson } = require('../../lib/log-result');
 
-exports.command = 'contents <filepath> [search] [repoList..]';
+exports.command = 'contents <filepath> [search] [repo..]';
 
 exports.describe = 'Search a file within a repository';
 

@@ -20,7 +20,7 @@ const {
 } = require('../../lib/create-result');
 const { logText, logTextWithSuffix, logJson } = require('../../lib/log-result');
 
-exports.command = 'package:engines [search] [repoList..]';
+exports.command = 'package:engines [search] [repo..]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
 
 exports.builder = yargs => {
@@ -85,8 +85,9 @@ const filterSearch = ({ search, regex }) => engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, limit, search, regex, json, repoList } = argv;
+	const { token, limit, search, regex, json, repo } = argv;
 	const filepath = 'package.json';
+	const repoList = repo;
 	const { errors, repositories } = getRepositories({ limit, repoList });
 
 	const getPackageJsonFile = getContents({

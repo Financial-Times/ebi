@@ -8,7 +8,8 @@ const {
 	withToken,
 	withLimit,
 	withRegex,
-	withJson
+	withJson,
+	withRepoList
 } = require('./shared');
 const { findMatchedKeyValuePairs } = require('../../lib/object-utils');
 
@@ -19,7 +20,7 @@ const {
 } = require('../../lib/create-result');
 const { logText, logTextWithSuffix, logJson } = require('../../lib/log-result');
 
-exports.command = 'package:engines [search]';
+exports.command = 'package:engines [search] [repo..]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
 
 exports.builder = yargs => {
@@ -28,7 +29,8 @@ exports.builder = yargs => {
 		withJson,
 		withRegex,
 		withToken,
-		withLimit
+		withLimit,
+		withRepoList
 	]);
 	return baseConfig(yargs).positional('search', {
 		type: 'string',
@@ -83,9 +85,10 @@ const filterSearch = ({ search, regex }) => engines => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, limit, search, regex, json } = argv;
+	const { token, limit, search, regex, json, repo } = argv;
 	const filepath = 'package.json';
-	const { errors, repositories } = getRepositories(limit);
+	const repoList = repo;
+	const { errors, repositories } = getRepositories({ limit, repoList });
 
 	const getPackageJsonFile = getContents({
 		githubToken: token,

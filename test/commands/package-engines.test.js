@@ -101,6 +101,23 @@ describe('package:engines command handler', () => {
 		expect(console.log).toBeCalledWith(expect.stringContaining('~10.15.0'));
 	});
 
+	test('when given <repoList> argument logs repository', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				engines: {
+					node: '~10.15.0'
+				}
+			}),
+			path: 'package.json'
+		});
+		await packageEnginesHandler();
+		expect(console.log).toBeCalledWith(
+			expect.stringContaining('Financial-Times/next-front-page')
+		);
+		expect(console.log).toBeCalledWith(expect.stringContaining('~10.15.0'));
+	});
+
 	test('multiple engines in package.json, logs repositories and versions', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',

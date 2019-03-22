@@ -94,6 +94,21 @@ describe('package command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
+	test('when given <repoList> argument, logs found repository', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({
+				name: 'next-front-page'
+			}),
+			path: 'package.json'
+		});
+		await packageHandler({
+			search: 'name',
+			repoList: repo
+		});
+		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
+	});
+
 	test('empty <search> value, logs existence of file', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',

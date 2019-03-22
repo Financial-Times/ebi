@@ -8,7 +8,8 @@ const {
 	withToken,
 	withLimit,
 	withRegex,
-	withJson
+	withJson,
+	withRepoList
 } = require('./shared');
 
 const {
@@ -18,7 +19,7 @@ const {
 } = require('../../lib/create-result');
 const { logText, logJson } = require('../../lib/log-result');
 
-exports.command = 'package [search]';
+exports.command = 'package [search] [repo..]';
 exports.desc = 'Search within the `package.json` file';
 
 exports.builder = yargs => {
@@ -27,7 +28,8 @@ exports.builder = yargs => {
 		withJson,
 		withRegex,
 		withToken,
-		withLimit
+		withLimit,
+		withRepoList
 	]);
 	return baseConfig(yargs).positional('search', {
 		type: 'string',
@@ -37,8 +39,9 @@ exports.builder = yargs => {
 };
 
 exports.handler = function(argv = {}) {
-	const { token, search, limit, regex, json } = argv;
-	const { errors, repositories } = getRepositories(limit);
+	const { token, search, limit, regex, json, repo } = argv;
+	const repoList = repo;
+	const { errors, repositories } = getRepositories({ limit, repoList });
 	const filepath = 'package.json';
 
 	const getPackageJson = getContents({

@@ -7,7 +7,8 @@ const {
 	withToken,
 	withLimit,
 	withRegex,
-	withJson
+	withJson,
+	withRepoList
 } = require('./shared');
 const {
 	createResult,
@@ -16,7 +17,7 @@ const {
 } = require('../../lib/create-result');
 const { logText, logJson } = require('../../lib/log-result');
 
-exports.command = 'contents <filepath> [search]';
+exports.command = 'contents <filepath> [search] [repo..]';
 
 exports.describe = 'Search a file within a repository';
 
@@ -26,7 +27,8 @@ exports.builder = yargs => {
 		withJson,
 		withRegex,
 		withToken,
-		withLimit
+		withLimit,
+		withRepoList
 	]);
 	return baseConfig(yargs)
 		.positional('filepath', {
@@ -41,9 +43,14 @@ exports.builder = yargs => {
 };
 
 exports.handler = (argv = {}) => {
-	const { filepath, token, search, regex, limit, json } = argv;
+	const { filepath, token, search, regex, limit, json, repo } = argv;
 
-	const { errors, repositories } = getRepositories(limit);
+	const repoList = repo;
+
+	const { errors, repositories } = getRepositories({
+		limit,
+		repoList
+	});
 
 	const getPathContents = getContents({
 		githubToken: token,

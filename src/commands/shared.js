@@ -2,7 +2,7 @@ const { GITHUB_PERSONAL_ACCESS_TOKEN } = process.env;
 
 const withEpilogue = yargs => {
 	return yargs.epilogue(
-		`NOTE: All commands require repositories to be piped into the command, where repositories are in the format '<owner>/<repository-name>'. For usage examples see https://github.com/Financial-Times/ebi/wiki/Usage-Examples`
+		`NOTE: If the repo argument is not provided, all commands require repositories to be piped into the command, where repositories are in the format '<owner>/<repository-name>'. For usage examples see https://github.com/Financial-Times/ebi/wiki/Usage-Examples`
 	);
 };
 
@@ -49,4 +49,18 @@ const withJson = yargs => {
 	});
 };
 
-module.exports = { withEpilogue, withLimit, withToken, withRegex, withJson };
+const withRepoList = yargs => {
+	return yargs.option('repoList', {
+		type: 'string',
+		describe: 'Space-separated list of repos to search within'
+	});
+};
+
+module.exports = {
+	withEpilogue,
+	withLimit,
+	withToken,
+	withRegex,
+	withJson,
+	withRepoList
+};

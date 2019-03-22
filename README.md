@@ -11,10 +11,10 @@ Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=h
 ## Usage
 
 1.  [Set up a GitHub personal access token](#setting-up-your-github-personal-access-token) (with all `repo` scopes) assigned to the `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable
-2.  Get a new line separated list of repositories eg, `echo -e "Financial-Times/ebi"`, `cat repositories.txt` (with an existing list) or using [HTTPie](https://httpie.org/) + [Tako](https://github.com/Financial-Times/tako) + [jq](https://stedolan.github.io/jq/)
-3.  Pass in the list of repositories, using `|`, to the `ebi` tool:
 
-        <list_of_repositories> | npx ebi <command>
+2.  Pass in the list of space-separated repositories as arguments:
+
+        npx ebi <command> Financial-Times/ebi Financial-Times/tako
 
 ### Examples
 
@@ -22,16 +22,21 @@ Show help
 
     npx ebi --help
 
+Input the repositories to the ebi command either via `stdin` or `args`.
 Determine whether a repo has a `Procfile`
 
 ```
 $ echo -e "Financial-Times/ebi" | npx ebi contents Procfile
 ```
 
+```
+$ npx ebi contents Procfile Financial-Times/ebi
+```
+
 Find all the `node` engines and their versions in `package.json`
 
 ```
-$ echo -e "Financial-Times/ebi" | npx ebi package:engines
+$ cat repositories.txt | npx ebi package:engines
 ```
 
 For more examples see [Usage Examples](https://github.com/Financial-Times/ebi/wiki/Usage-Examples).

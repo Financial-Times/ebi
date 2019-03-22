@@ -1,6 +1,10 @@
 const createStandardInput = require('../helpers/create-standard-input');
 const getRepositories = require('../../lib/get-repositories');
 
+afterEach(() => {
+	jest.resetAllMocks();
+});
+
 describe.each`
 	input
 	${undefined}
@@ -10,25 +14,29 @@ describe.each`
 	test(`has no repository`, () => {
 		createStandardInput(input);
 
-		const { repositories } = getRepositories();
+		const { repositories } = getRepositories({});
 		expect(repositories).toEqual([]);
 	});
 
 	test(`has no error`, () => {
 		createStandardInput(input);
 
-		const { errors } = getRepositories();
+		const { errors } = getRepositories({});
 		expect(errors).toEqual([]);
 	});
 });
 
 describe('getRepositories', () => {
+	test('can run with no arguments', () => {
+		expect(() => getRepositories()).not.toThrow();
+	});
+
 	test('works for single repository', () => {
 		createStandardInput('Financial-Times/something');
 
 		const {
 			repositories: [repository]
-		} = getRepositories();
+		} = getRepositories({});
 		expect(repository).toEqual('Financial-Times/something');
 	});
 
@@ -48,7 +56,7 @@ describe('getRepositories', () => {
 
 		const {
 			repositories: [firstRepo, secondRepo]
-		} = getRepositories();
+		} = getRepositories({});
 		expect(firstRepo).toEqual('Financial-Times/something');
 		expect(secondRepo).toEqual('Financial-Times/something-else');
 	});
@@ -56,15 +64,45 @@ describe('getRepositories', () => {
 	test('ignores empty lines', () => {
 		createStandardInput('Financial-Times/something\n\n');
 
-		const { repositories } = getRepositories();
+		const { repositories } = getRepositories({});
 		expect(repositories).toHaveLength(1);
 	});
 
 	test('filters repos that are in the wrong format', () => {
 		createStandardInput('something');
 
-		const { repositories } = getRepositories();
+		const { repositories } = getRepositories({});
 		expect(repositories).toHaveLength(0);
+	});
+
+	test('takes repoList as an arg to provide repo array', () => {
+		process.stdin.isTTY = true;
+		const { repositories } = getRepositories({
+			repoList: ['Financial-Times/something']
+		});
+		expect(repositories).toHaveLength(1);
+		process.stdin.isTTY = false;
+	});
+
+	test('takes empty repoList as an arg and uses piped content', () => {
+		createStandardInput('Financial-Times/something');
+
+		const {
+			repositories: [repository]
+		} = getRepositories({
+			repoList: []
+		});
+		expect(repository).toEqual('Financial-Times/something');
+	});
+
+	test('providing stdin and repoList arg produces error', () => {
+		createStandardInput('Financial-Times/something');
+
+		expect(() =>
+			getRepositories({ repoList: ['Financial-Times/something'] })
+		).toThrowError(
+			'choose either to pipe through a repo list OR pass it as args'
+		);
 	});
 });
 
@@ -80,7 +118,7 @@ describe.each`
 	test(`returns error`, () => {
 		createStandardInput(input);
 
-		const { errors } = getRepositories();
+		const { errors } = getRepositories({});
 		expect(errors).toEqual(expectedErrors);
 	});
 });

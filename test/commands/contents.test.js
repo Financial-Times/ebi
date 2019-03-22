@@ -9,8 +9,12 @@ const repo = 'Financial-Times/next-front-page';
 let nockScope;
 let standardInput;
 
+const INPUT_TYPES = {
+	ARGS: 'args',
+	STDIN: 'stdin'
+};
+
 beforeEach(() => {
-	standardInput = createStandardInput(repo);
 	nockScope = nock('https://api.github.com/repos');
 	// NB comment out this spy on console.error if you want to see errors during your tests
 	jest.spyOn(console, 'error')
@@ -27,14 +31,33 @@ afterEach(() => {
 	standardInput.teardown();
 });
 
+const initializeContentsHandler = ({ repos = [], args, inputType }) => {
+	if (inputType === INPUT_TYPES.ARGS) {
+		standardInput = createStandardInput('');
+		return contentsHandler({
+			...args,
+			repoList: repos
+		});
+	} else if (inputType === INPUT_TYPES.STDIN) {
+		const reposString = repos.join('\n');
+		standardInput = createStandardInput(reposString);
+		return contentsHandler(args);
+	} else {
+		throw new Error('Invalid contents handler inputType');
+	}
+};
+
 describe('Log error for invalid repository', () => {
 	const invalidRepository = 'something-invalid';
 
 	test(`'${invalidRepository}'`, async () => {
-		createStandardInput(invalidRepository);
-		await contentsHandler({
-			filepath: 'Procfile',
-			search: 'node'
+		await initializeContentsHandler({
+			repos: [invalidRepository],
+			inputType: INPUT_TYPES.STDIN,
+			args: {
+				filepath: 'Procfile',
+				search: 'node'
+			}
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -43,11 +66,14 @@ describe('Log error for invalid repository', () => {
 	});
 
 	test(`'${invalidRepository}' in json`, async () => {
-		createStandardInput(invalidRepository);
-		await contentsHandler({
-			filepath: 'Procfile',
-			search: 'node',
-			json: true
+		await initializeContentsHandler({
+			repos: [invalidRepository],
+			inputType: INPUT_TYPES.STDIN,
+			args: {
+				filepath: 'Procfile',
+				search: 'node',
+				json: true
+			}
 		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
@@ -63,16 +89,24 @@ describe('Log error for invalid repository', () => {
 
 describe('contents command handler', () => {
 	test('ignore empty string repositories', async () => {
-		createStandardInput('');
+		await initializeContentsHandler({
+			repos: [],
+			inputType: INPUT_TYPES.STDIN,
+			args: {
+				filepath: 'Procfile',
+				search: 'web'
+			}
+		});
 
-		await contentsHandler({ filepath: 'Procfile', search: 'web' });
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
 
 	test('no arguments does nothing', async () => {
-		createStandardInput('');
-		await contentsHandler();
+		await initializeContentsHandler({
+			inputType: INPUT_TYPES.STDIN
+		});
+
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
@@ -83,7 +117,28 @@ describe('contents command handler', () => {
 			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({ filepath: 'Procfile', search: 'web' });
+
+		await initializeContentsHandler({
+			repos: [repo],
+			inputType: INPUT_TYPES.STDIN,
+			args: { filepath: 'Procfile', search: 'web' }
+		});
+
+		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
+	});
+
+	test('when contents handler is called with valid <file> and <search> and <repo list> values, a list of repositories are logged', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: n-cluster server/init.js'),
+			path: 'Procfile'
+		});
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile', search: 'web' },
+			inputType: INPUT_TYPES.STDIN
+		});
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
@@ -91,7 +146,13 @@ describe('contents command handler', () => {
 		nockScope
 			.get(`/${repo}/contents/server`)
 			.reply(200, [{ path: 'app.js' }, { path: 'libs' }]);
-		await contentsHandler({ filepath: 'server', search: 'app' });
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'server', search: 'app' },
+			inputType: INPUT_TYPES.STDIN
+		});
+
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining(`'server' is not a file path`)
 		);
@@ -103,13 +164,23 @@ describe('contents command handler', () => {
 			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({ filepath: 'Procfile' });
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile' },
+			inputType: INPUT_TYPES.STDIN
+		});
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
 	test('logs error if file does not exist', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
-		await contentsHandler({ filepath: 'Procfile', search: 'something' });
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile', search: 'something' },
+			inputType: INPUT_TYPES.STDIN
+		});
 
 		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
 		expect(console.error).toBeCalledWith(
@@ -119,6 +190,13 @@ describe('contents command handler', () => {
 
 	test('logs error if file does not exist (with no search)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile', search: 'something' },
+			inputType: INPUT_TYPES.STDIN
+		});
+
 		await contentsHandler({ filepath: 'Procfile' });
 
 		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
@@ -133,9 +211,11 @@ describe('contents command handler', () => {
 			content: base64Encode('web: n-cluster server/init.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			filepath: 'Procfile',
-			search: 'something-else'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile', search: 'something-else' },
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
@@ -150,10 +230,11 @@ describe('contents command handler', () => {
 			content: base64Encode('web: node 1234.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			filepath: 'Procfile',
-			// NOTE: the extra \'s are not needed on the command line
-			regex: '\\d{3}\\.js$'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile', regex: '\\d{3}\\.js$' },
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
@@ -165,9 +246,11 @@ describe('contents command handler', () => {
 			content: base64Encode('web: node 1234.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			filepath: 'Procfile',
-			regex: 'something.js$'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { filepath: 'Procfile', regex: 'something.js$' },
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		expect(console.log).not.toBeCalled();
@@ -183,10 +266,15 @@ describe('contents command handler', () => {
 			content: base64Encode('web: node 1234.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			filepath: 'Procfile',
-			regex: 'something-else',
-			search: 'node'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: {
+				filepath: 'Procfile',
+				regex: 'something-else',
+				search: 'node'
+			},
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -202,9 +290,11 @@ describe('json output', () => {
 			content: base64Encode('web: node 1234.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			json: true,
-			filepath: 'Procfile'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { json: true, filepath: 'Procfile' },
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
@@ -222,10 +312,11 @@ describe('json output', () => {
 			content: base64Encode('web: node 1234.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			json: true,
-			filepath: 'Procfile',
-			search: 'node'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { json: true, filepath: 'Procfile', search: 'node' },
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
@@ -244,10 +335,11 @@ describe('json output', () => {
 			content: base64Encode('web: node 1234.js'),
 			path: 'Procfile'
 		});
-		await contentsHandler({
-			json: true,
-			filepath: 'Procfile',
-			regex: 'node'
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { json: true, filepath: 'Procfile', regex: 'node' },
+			inputType: INPUT_TYPES.STDIN
 		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
@@ -262,7 +354,12 @@ describe('json output', () => {
 
 	test('shows json error', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
-		await contentsHandler({ filepath: 'Procfile', json: true });
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: { json: true, filepath: 'Procfile' },
+			inputType: INPUT_TYPES.STDIN
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -285,24 +382,22 @@ describe.each([
 	],
 	[['Financial-Times/next-front-page', 'Financial-Times/next-signup'], 2],
 	[['Financial-Times/next-front-page'], 1]
-])('test limit flag of value 2', (repositories, numResults) => {
-	test(`${
-		repositories.length
-	} repos returns ${numResults} results`, async () => {
-		const repositoriesForStdIn = repositories.join('\n');
-		createStandardInput(repositoriesForStdIn);
-		repositories.forEach(repo => {
+])('test limit flag of value 2', (repos, numResults) => {
+	test(`${repos.length} repos returns ${numResults} results`, async () => {
+		repos.forEach(repo => {
 			nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 				type: 'file',
 				content: base64Encode('web: n-cluster server/init.js'),
 				path: 'Procfile'
 			});
 		});
-		await contentsHandler({
-			filepath: 'Procfile',
-			search: 'web',
-			limit: 2
+
+		await initializeContentsHandler({
+			repos,
+			args: { filepath: 'Procfile', search: 'web', limit: 2 },
+			inputType: INPUT_TYPES.STDIN
 		});
+
 		expect(console.log).toHaveBeenCalledTimes(numResults);
 	});
 });

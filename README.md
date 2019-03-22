@@ -11,10 +11,15 @@ Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=h
 ## Usage
 
 1.  [Set up a GitHub personal access token](#setting-up-your-github-personal-access-token) (with all `repo` scopes) assigned to the `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable
-2.  Get a new line separated list of repositories eg, `echo -e "Financial-Times/ebi"`, `cat repositories.txt` (with an existing list) or using [HTTPie](https://httpie.org/) + [Tako](https://github.com/Financial-Times/tako) + [jq](https://stedolan.github.io/jq/)
-3.  Pass in the list of repositories, using `|`, to the `ebi` tool:
+2.  Get a new-line-separated list of repositories eg, `echo -e "Financial-Times/ebi"`, `cat repositories.txt` (with an existing list) or using [HTTPie](https://httpie.org/) + [Tako](https://github.com/Financial-Times/tako) + [jq](https://stedolan.github.io/jq/)
+3.  Input the repositories to the ebi command either via `args` or `stdin`:
+    a. Pass in the list of repositories, using `|`, to the `ebi` tool:
 
         <list_of_repositories> | npx ebi <command>
+
+    b. Pass in the list of space-separated repositories as arguments:
+
+        npx ebi <command> Financial-Times/ebi Financial-Times/tako
 
 ### Examples
 

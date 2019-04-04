@@ -6,8 +6,7 @@ const config = {
 	},
 	parserOptions: {
 		ecmaVersion: 2017,
-		sourceType: 'module',
-		ecmaVersion: 2018
+		sourceType: 'module'
 	},
 	rules: {
 		eqeqeq: 2,

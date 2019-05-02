@@ -1,13 +1,12 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const nock = require('nock');
 
-const createStandardInput = require('../helpers/create-standard-input');
+const setupReadline = require('../helpers/setup-readline');
 const { base64Encode } = require('../helpers/base64');
 const { handler: contentsHandler } = require('../../src/commands/contents');
 const repo = 'Financial-Times/next-front-page';
 
 let nockScope;
-let standardInput;
 
 const INPUT_TYPES = {
 	ARGS: 'args',
@@ -28,20 +27,25 @@ beforeEach(() => {
 afterEach(() => {
 	nock.cleanAll();
 	jest.resetAllMocks();
-	standardInput.teardown();
 });
+
+const initializeHandlerForStdin = ({ repos, args }) => {
+	const reposString = repos.join('\n');
+	const { readString, teardown } = setupReadline(reposString);
+	const handler = contentsHandler(args);
+	readString(reposString);
+
+	return handler.then(teardown);
+};
 
 const initializeContentsHandler = ({ repos = [], args, inputType }) => {
 	if (inputType === INPUT_TYPES.ARGS) {
-		standardInput = createStandardInput('');
 		return contentsHandler({
 			...args,
 			repoList: repos
 		});
 	} else if (inputType === INPUT_TYPES.STDIN) {
-		const reposString = repos.join('\n');
-		standardInput = createStandardInput(reposString);
-		return contentsHandler(args);
+		return initializeHandlerForStdin({ repos, args });
 	} else {
 		throw new Error('Invalid contents handler inputType');
 	}
@@ -191,13 +195,10 @@ describe('contents command handler', () => {
 	test('logs error if file does not exist (with no search)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
 
-		await initializeContentsHandler({
+		await initializeHandlerForStdin({
 			repos: [repo],
-			args: { filepath: 'Procfile', search: 'something' },
-			inputType: INPUT_TYPES.STDIN
+			args: { filepath: 'Procfile' }
 		});
-
-		await contentsHandler({ filepath: 'Procfile' });
 
 		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
 		expect(console.error).toBeCalledWith(

@@ -84,11 +84,11 @@ const filterSearch = ({ search, regex }) => engines => {
 	}
 };
 
-exports.handler = function(argv = {}) {
+exports.handler = async function(argv = {}) {
 	const { token, limit, search, regex, json, repo } = argv;
 	const filepath = 'package.json';
 	const repoList = repo;
-	const { errors, repositories } = getRepositories({ limit, repoList });
+	const { errors, repositories } = await getRepositories({ limit, repoList });
 
 	const getPackageJsonFile = getContents({
 		githubToken: token,

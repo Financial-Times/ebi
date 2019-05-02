@@ -42,12 +42,12 @@ exports.builder = yargs => {
 		});
 };
 
-exports.handler = (argv = {}) => {
+exports.handler = async (argv = {}) => {
 	const { filepath, token, search, regex, limit, json, repo } = argv;
 
 	const repoList = repo;
 
-	const { errors, repositories } = getRepositories({
+	const { errors, repositories } = await getRepositories({
 		limit,
 		repoList
 	});

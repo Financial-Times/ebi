@@ -1,7 +1,7 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const nock = require('nock');
 
-const createStandardInput = require('../helpers/create-standard-input');
+const setupReadline = require('../helpers/setup-readline');
 const { base64EncodeObj } = require('../helpers/base64');
 const {
 	handler: packageEnginesHandler
@@ -9,10 +9,17 @@ const {
 const repo = 'Financial-Times/next-front-page';
 
 let nockScope;
-let standardInput;
+
+const initializeHandlerForStdin = ({ repos, args }) => {
+	const reposString = repos.join('\n');
+	const { readString, teardown } = setupReadline(reposString);
+	const handler = packageEnginesHandler(args);
+	readString(reposString);
+
+	return handler.then(teardown);
+};
 
 beforeEach(() => {
-	standardInput = createStandardInput(repo);
 	nockScope = nock('https://api.github.com/repos');
 	// NB comment out this spy on console.error if you want to see errors during your tests
 	jest.spyOn(console, 'error')
@@ -26,15 +33,15 @@ beforeEach(() => {
 afterEach(() => {
 	nock.cleanAll();
 	jest.resetAllMocks();
-	standardInput.teardown();
 });
 
 describe('Log error for invalid repository', () => {
 	const invalidRepository = 'something-invalid';
 
 	test(`'${invalidRepository}'`, async () => {
-		standardInput = createStandardInput(invalidRepository);
-		await packageEnginesHandler();
+		await initializeHandlerForStdin({
+			repos: [invalidRepository]
+		});
 
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('invalid repository')
@@ -42,8 +49,10 @@ describe('Log error for invalid repository', () => {
 	});
 
 	test(`'${invalidRepository}' in json`, async () => {
-		standardInput = createStandardInput(invalidRepository);
-		await packageEnginesHandler({ json: true });
+		await initializeHandlerForStdin({
+			repos: [invalidRepository],
+			args: { json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -56,28 +65,36 @@ describe('Log error for invalid repository', () => {
 });
 
 describe('package:engines command handler', () => {
-	test('ignore empty string repositories', async () => {
-		createStandardInput('');
+	test('ignore empty repositories', async () => {
+		await initializeHandlerForStdin({
+			repos: [],
+			args: {}
+		});
 
-		await packageEnginesHandler({});
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
 
 	test('no arguments does nothing', async () => {
-		createStandardInput('');
-		await packageEnginesHandler();
+		await initializeHandlerForStdin({
+			repos: []
+		});
+
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
 
 	test('repository not found', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
-		standardInput = createStandardInput(invalidRepo);
+
 		nockScope.get(`/${invalidRepo}/contents/package.json`).reply(404, {
 			message: 'Not Found'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [invalidRepo]
+		});
+
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('404 ERROR')
 		);
@@ -93,7 +110,10 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
 
 		expect(console.log).toBeCalledWith(
 			expect.stringContaining('Financial-Times/next-front-page')
@@ -111,7 +131,11 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
+
 		expect(console.log).toBeCalledWith(
 			expect.stringContaining('Financial-Times/next-front-page')
 		);
@@ -129,7 +153,10 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
 
 		expect(console.log).toBeCalledWith(
 			expect.stringContaining('Financial-Times/next-front-page')
@@ -153,8 +180,12 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			search: 'node'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				search: 'node'
+			}
 		});
 
 		expect(console.log).toBeCalledWith(
@@ -179,8 +210,12 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			search: '8.0.0'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				search: '8.0.0'
+			}
 		});
 
 		expect(console.log).not.toBeCalledWith(
@@ -199,8 +234,12 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			search: '6.8.0'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				search: '6.8.0'
+			}
 		});
 
 		expect(console.log).toBeCalledWith(
@@ -220,7 +259,11 @@ describe('package:engines command handler', () => {
 			content: base64EncodeObj({}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
+
 		expect(console.log).not.toBeCalled();
 	});
 
@@ -230,7 +273,11 @@ describe('package:engines command handler', () => {
 			content: base64EncodeObj({}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
+
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('engines field not found')
 		);
@@ -242,7 +289,11 @@ describe('package:engines command handler', () => {
 			content: base64EncodeObj({ engines: {} }),
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
+
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('no match')
@@ -255,7 +306,11 @@ describe('package:engines command handler', () => {
 			content: 'something-invalid',
 			path: 'package.json'
 		});
-		await packageEnginesHandler();
+
+		await initializeHandlerForStdin({
+			repos: [repo]
+		});
+
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('parse error')
 		);
@@ -271,8 +326,12 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			regex: 'no.*'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				regex: 'no.*'
+			}
 		});
 
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
@@ -288,8 +347,12 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			regex: '\\.15\\..*'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				regex: '\\.15\\..*'
+			}
 		});
 
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
@@ -305,8 +368,12 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			regex: 'something$'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				regex: 'something$'
+			}
 		});
 
 		expect(console.log).not.toBeCalled();
@@ -326,9 +393,13 @@ describe('package:engines command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({
-			regex: 'something-else',
-			search: 'node'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				regex: 'something-else',
+				search: 'node'
+			}
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -353,7 +424,11 @@ describe('json output', () => {
 			content: base64EncodeObj(packageJson),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({ json: true });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -371,7 +446,11 @@ describe('json output', () => {
 			content: base64EncodeObj(packageJson),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({ json: true, search: 'node' });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { json: true, search: 'node' }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -390,7 +469,11 @@ describe('json output', () => {
 			content: base64EncodeObj(packageJson),
 			path: 'package.json'
 		});
-		await packageEnginesHandler({ json: true, regex: 'no.*' });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { json: true, regex: 'no.*' }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -405,7 +488,11 @@ describe('json output', () => {
 
 	test('shows json with error', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(404);
-		await packageEnginesHandler({ json: true });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -432,8 +519,6 @@ describe.each([
 	test(`${
 		repositories.length
 	} repos returns ${numResults} results`, async () => {
-		const repositoriesForStdIn = repositories.join('\n');
-		standardInput = createStandardInput(repositoriesForStdIn);
 		repositories.forEach(repo => {
 			nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 				type: 'file',
@@ -445,7 +530,12 @@ describe.each([
 				path: 'package.json'
 			});
 		});
-		await packageEnginesHandler({ limit: 2 });
+
+		await initializeHandlerForStdin({
+			repos: repositories,
+			args: { limit: 2 }
+		});
+
 		expect(console.log).toHaveBeenCalledTimes(numResults);
 	});
 });

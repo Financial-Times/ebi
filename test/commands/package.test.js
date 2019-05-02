@@ -1,16 +1,23 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const nock = require('nock');
 
-const createStandardInput = require('../helpers/create-standard-input');
+const setupReadline = require('../helpers/setup-readline');
 const { base64EncodeObj } = require('../helpers/base64');
 const { handler: packageHandler } = require('../../src/commands/package');
 const repo = 'Financial-Times/next-front-page';
 
-let standardInput;
 let nockScope;
 
+const initializeHandlerForStdin = ({ repos, args }) => {
+	const reposString = repos.join('\n');
+	const { readString, teardown } = setupReadline(reposString);
+	const handler = packageHandler(args);
+	readString(reposString);
+
+	return handler.then(teardown);
+};
+
 beforeEach(() => {
-	standardInput = createStandardInput(repo);
 	nockScope = nock('https://api.github.com/repos');
 	// NB comment out this spy on console.error if you want to see errors during your tests
 	jest.spyOn(console, 'error')
@@ -24,15 +31,16 @@ beforeEach(() => {
 afterEach(() => {
 	nock.cleanAll();
 	jest.resetAllMocks();
-	standardInput.teardown();
 });
 
 describe('Log error for invalid repository', () => {
 	const invalidRepository = 'something-invalid';
 
 	test(`'${invalidRepository}'`, async () => {
-		createStandardInput(invalidRepository);
-		await packageHandler({ search: 'something' });
+		await initializeHandlerForStdin({
+			repos: [invalidRepository],
+			args: { search: 'something' }
+		});
 
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('invalid repository')
@@ -40,8 +48,10 @@ describe('Log error for invalid repository', () => {
 	});
 
 	test(`'${invalidRepository}' in json`, async () => {
-		createStandardInput(invalidRepository);
-		await packageHandler({ search: 'something', json: true });
+		await initializeHandlerForStdin({
+			repos: [invalidRepository],
+			args: { search: 'something', json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -56,27 +66,35 @@ describe('Log error for invalid repository', () => {
 
 describe('package command handler', () => {
 	test('ignore empty string repositories', async () => {
-		createStandardInput('');
+		await initializeHandlerForStdin({
+			repos: [],
+			args: { search: 'something' }
+		});
 
-		await packageHandler({ search: 'something' });
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
 
 	test('no arguments does nothing', async () => {
-		createStandardInput('');
-		await packageHandler();
+		await initializeHandlerForStdin({
+			repos: []
+		});
+
 		expect(console.log).not.toBeCalled();
 		expect(console.error).not.toBeCalled();
 	});
 
 	test('repository not found', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
-		standardInput = createStandardInput(invalidRepo);
 		nockScope.get(`/${invalidRepo}/contents/package.json`).reply(404, {
 			message: 'Not Found'
 		});
-		await packageHandler({ search: 'something' });
+
+		await initializeHandlerForStdin({
+			repos: [invalidRepo],
+			args: { search: 'something' }
+		});
+
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('404 ERROR')
 		);
@@ -90,7 +108,12 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({ search: 'name' });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'name' }
+		});
+
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
@@ -102,10 +125,12 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({
-			search: 'name',
-			repoList: repo
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'name', repoList: repo }
 		});
+
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
@@ -117,7 +142,12 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({});
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {}
+		});
+
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
@@ -129,7 +159,12 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({ search: 'something-else' });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'something-else' }
+		});
+
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
 		expect(console.error).toBeCalledWith(
 			expect.stringContaining('no match')
@@ -144,9 +179,13 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({
-			// NOTE: the extra \'s are not needed on the command line
-			regex: 'front-.*$'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: {
+				// NOTE: the extra \'s are not needed on the command line
+				regex: 'front-.*$'
+			}
 		});
 
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
@@ -160,8 +199,10 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({
-			regex: 'something$'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { regex: 'something$' }
 		});
 
 		expect(console.log).not.toBeCalled();
@@ -179,9 +220,10 @@ describe('package command handler', () => {
 			}),
 			path: 'package.json'
 		});
-		await packageHandler({
-			regex: 'something-else',
-			search: 'front'
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { regex: 'something-else', search: 'front' }
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -204,7 +246,11 @@ describe('json output', () => {
 			content: base64EncodeObj(packageJson),
 			path: 'package.json'
 		});
-		await packageHandler({ json: true });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -221,7 +267,11 @@ describe('json output', () => {
 			content: base64EncodeObj(packageJson),
 			path: 'package.json'
 		});
-		await packageHandler({ search: 'name', json: true });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'name', json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -239,7 +289,11 @@ describe('json output', () => {
 			content: base64EncodeObj(packageJson),
 			path: 'package.json'
 		});
-		await packageHandler({ regex: 'front-.*', json: true });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { regex: 'front-.*', json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -253,7 +307,11 @@ describe('json output', () => {
 
 	test('shows json error', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(404);
-		await packageHandler({ search: 'something', json: true });
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'something', json: true }
+		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
@@ -281,8 +339,6 @@ describe.each([
 	test(`${
 		repositories.length
 	} repos returns ${numResults} results`, async () => {
-		const repositoriesForStdIn = repositories.join('\n');
-		standardInput = createStandardInput(repositoriesForStdIn);
 		repositories.forEach(repo => {
 			nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 				type: 'file',
@@ -292,7 +348,12 @@ describe.each([
 				path: 'package.json'
 			});
 		});
-		await packageHandler({ search: 'name', limit: 2 });
+
+		await initializeHandlerForStdin({
+			repos: repositories,
+			args: { search: 'name', limit: 2 }
+		});
+
 		expect(console.log).toHaveBeenCalledTimes(numResults);
 	});
 });

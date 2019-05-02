@@ -38,10 +38,10 @@ exports.builder = yargs => {
 	});
 };
 
-exports.handler = function(argv = {}) {
+exports.handler = async function(argv = {}) {
 	const { token, search, limit, regex, json, repo } = argv;
 	const repoList = repo;
-	const { errors, repositories } = getRepositories({ limit, repoList });
+	const { errors, repositories } = await getRepositories({ limit, repoList });
 	const filepath = 'package.json';
 
 	const getPackageJson = getContents({

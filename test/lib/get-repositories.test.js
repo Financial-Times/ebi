@@ -1,8 +1,19 @@
 const setupReadline = require('../helpers/setup-readline');
 const getRepositories = require('../../lib/get-repositories');
 
-const getRepositoriesWithCleanup = async ({ input, args }) => {
-	const { readString, teardown } = setupReadline();
+/**
+ * Get repositories with clean up of readline
+ *
+ * @param {string} input - standard input string
+ * @param {any} args - `getRepositories` arguments
+ * @param {any} setupReadlineArgs - `setupReadline` arguments
+ */
+const getRepositoriesWithCleanup = async ({
+	input,
+	args,
+	setupReadlineArgs
+}) => {
+	const { readString, teardown } = setupReadline(setupReadlineArgs);
 
 	const getRepos = getRepositories(args);
 	readString(input);
@@ -117,15 +128,15 @@ describe('getRepositories', () => {
 		expect(repository).toEqual('Financial-Times/something');
 	});
 
-	test('providing stdin and repoList arg produces error', async () => {
-		await expect(
-			getRepositoriesWithCleanup({
-				input: 'Financial-Times/something',
-				args: { repoList: ['Financial-Times/something'] }
-			})
-		).rejects.toThrowError(
-			'choose either to pipe through a repo list OR pass it as args'
-		);
+	test('providing stdin and repoList arg processes args then stdin', async () => {
+		const { repositories } = await getRepositoriesWithCleanup({
+			input: 'Financial-Times/something-else',
+			args: { repoList: ['Financial-Times/something'] }
+		});
+		expect(repositories).toEqual([
+			'Financial-Times/something',
+			'Financial-Times/something-else'
+		]);
 	});
 });
 

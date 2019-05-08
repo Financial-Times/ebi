@@ -97,12 +97,44 @@ This tool requires a [GitHub personal access token](https://help.github.com/arti
         # or,
         ./bin/ebi.js <command>
 
+### Testing
+
+To run linting and tests
+
+    npm test
+
+To just run linting
+
+    npm run lint
+
+To fix linting issues
+
+    npm run lint-fix
+
+To just run unit tests
+
+    npm run unit-test
+
+To watch files and run unit tests
+
+    npm run unit-test:watch
+
+To watch individual files and run unit tests
+
+    npm run unit-test:watch -- [file...]
+    # eg,
+    npm run unit-test:watch -- test/lib/get-repositories.test.js
+
 ### Code formatting with Prettier
 
 This repo uses [prettier](https://prettier.io/) for code formatting. To make the most of this when working locally:
 
 -   Install the [`prettier-vscode`](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension in the extension side bar
 -   Update your settings to format files on save. This will check your file meets the prettier guidelines and will fix it each time you save. You can update the setting at `Code` --> `Preferences` --> `Settings` --> update `"editor.formatOnSave": true`
+
+To make sure no `eslint` rules conflict with the prettier config, we have [eslint-config-prettier](https://github.com/prettier/eslint-config-prettier). This can be run with:
+
+    npm run eslint-check
 
 ### Publishing a release
 

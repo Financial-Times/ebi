@@ -8,7 +8,8 @@
 		"lint-fix": "eslint --fix *.js src/ lib/ test/",
 		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
 		"test": "npm run lint && npm run unit-test",
-		"unit-test": "jest"
+		"unit-test": "jest",
+		"unit-test:watch": "jest --watch"
 	},
 	"repository": {
 		"type": "git",

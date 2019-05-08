@@ -1,8 +1,8 @@
 const setupReadline = require('../helpers/setup-readline');
 const readStardardInputLines = require('../../lib/read-standard-input-lines');
 
-const setupReadStdin = async ({ input } = {}) => {
-	const { readString, teardown } = setupReadline();
+const setupReadStdin = async ({ input, createInterface } = {}) => {
+	const { readString, teardown } = setupReadline({ createInterface });
 	const read = readStardardInputLines();
 	readString(input);
 	const lines = await read;
@@ -14,6 +14,12 @@ const setupReadStdin = async ({ input } = {}) => {
 describe('readStardardInputLines', () => {
 	test('outputs empty array with no input', async () => {
 		const lines = await setupReadStdin();
+		expect(lines).toEqual([]);
+	});
+
+	test('outputs empty array with no readline interface (ie, no standard input)', async () => {
+		// Return nothing for createInterface to simulate no standard input
+		const lines = await setupReadStdin({ createInterface: () => {} });
 		expect(lines).toEqual([]);
 	});
 

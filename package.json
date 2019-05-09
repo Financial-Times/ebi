@@ -34,7 +34,7 @@
 	},
 	"homepage": "https://github.com/Financial-Times/ebi#readme",
 	"engines": {
-		"node": "10.15.0"
+		"node": "^8.16.0 || ^10.15.3"
 	},
 	"husky": {
 		"hooks": {

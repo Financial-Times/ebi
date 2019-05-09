@@ -3,8 +3,13 @@ version: 2.1
 executors:
     circleci-node-10:
         docker:
-            - image: circleci/node:10.15.0
-        working_directory: ~/project/build
+            - image: circleci/node:10
+        working_directory: ~/project/build-node-10
+
+    circleci-node-8:
+        docker:
+            - image: circleci/node:8
+        working_directory: ~/project/build-node-8
 
 commands:
     npm-install:
@@ -26,31 +31,6 @@ references:
             at: *workspace_root
 
     #
-    # Cache keys
-    #
-    cache_keys_root: &cache_keys_root
-        keys:
-            - cache-root-v1-{{ .Branch }}-{{ checksum "./package.json" }}
-
-    #
-    # Cache creation
-    #
-
-    create_cache_root: &create_cache_root
-        save_cache:
-            key: cache-root-v1-{{ .Branch }}-{{ checksum "./package.json" }}
-            paths:
-                - ./node_modules/
-
-    #
-    # Cache restoration
-    #
-
-    restore_cache_root: &restore_cache_root
-        restore_cache:
-            <<: *cache_keys_root
-
-    #
     # Filters
     #
 
@@ -67,19 +47,33 @@ references:
             ignore: /.*/
 
 jobs:
-    build:
-        executor: circleci-node-10
+    build-node-8:
+        executor: circleci-node-8
         steps:
             - checkout
-            - *restore_cache_root
             - npm-install
-            - *create_cache_root
             - persist_to_workspace:
                   root: *workspace_root
                   paths:
-                      - build
+                      - build-node-8
+    build-node-10:
+        executor: circleci-node-10
+        steps:
+            - checkout
+            - npm-install
+            - persist_to_workspace:
+                  root: *workspace_root
+                  paths:
+                      - build-node-10
 
-    test:
+    test-node-8:
+        executor: circleci-node-8
+        steps:
+            - *attach_workspace
+            - run:
+                  name: Run tests
+                  command: npm test
+    test-node-10:
         executor: circleci-node-10
         steps:
             - *attach_workspace
@@ -115,27 +109,44 @@ workflows:
 
     build-test:
         jobs:
-            - build:
+            - build-node-8:
                   filters:
                       <<: *filters_branch_build
-            - test:
+            - build-node-10:
+                  filters:
+                      <<: *filters_branch_build
+            - test-node-8:
                   filters:
                       <<: *filters_branch_build
                   requires:
-                      - build
+                      - build-node-8
+            - test-node-10:
+                  filters:
+                      <<: *filters_branch_build
+                  requires:
+                      - build-node-10
 
     build-test-publish:
         jobs:
-            - build:
+            - build-node-8:
                   filters:
                       <<: *filters_release_package_build
-            - test:
+            - build-node-10:
+                  filters:
+                      <<: *filters_release_package_build
+            - test-node-8:
                   filters:
                       <<: *filters_release_package_build
                   requires:
-                      - build
+                      - build-node-8
+            - test-node-10:
+                  filters:
+                      <<: *filters_release_package_build
+                  requires:
+                      - build-node-10
             - publish:
                   filters:
                       <<: *filters_release_package_build
                   requires:
-                      - test
+                      - test-node-8
+                      - test-node-10

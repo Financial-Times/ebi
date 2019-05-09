@@ -11,6 +11,7 @@ Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=h
 ## Global installation (recommmended)
 
 `npm install --global @financial-times/ebi`
+
 When you run the tool, it will automatically notify you if there is a newer version of it available for you to update to.
 
 [You can disable notifications](https://www.npmjs.com/package/update-notifier#user-settings) if you'd prefer not to be notified about updates.
@@ -18,6 +19,7 @@ When you run the tool, it will automatically notify you if there is a newer vers
 ## No installation
 
 `npx @financial-times/ebi`
+
 The npx command lets you use this tool without installing it. However, each time you use npx it downloads the whole package from the npm registry, which takes a while. That's why global installation is reccommended.
 
 > Note: If this tool is globally installed, npx @financial-times/ebi will use that globally installed version rather than downloading.
@@ -98,15 +100,15 @@ This tool requires a [GitHub personal access token](https://help.github.com/arti
 
 1.  Install [nvm](https://github.com/creationix/nvm) and use the correct node version
 
-        `nvm use`
+        nvm use
 
 1.  Install dependencies
 
-        `npm install`
+        npm install
 
 1.  Run with:
 
-        `./bin/ebi.js <command>`
+        ./bin/ebi.js <command>
 
 ### Code formatting with Prettier
 

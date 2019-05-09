@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require('./helpers/update-notifier');
+
 const { withEpilogue } = require('../src/commands/shared');
 
 const yargs = require('yargs');

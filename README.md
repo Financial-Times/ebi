@@ -8,42 +8,58 @@ A command line tool that searches files within GitHub repositories.
 
 Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=home&op=translate&sl=en&tl=ja&text=Prawn), and intends to be a small little tool to crawl through your sea of code on GitHub, finding you nuggets of information.
 
+## Global installation (recommmended)
+
+`npm install --global @financial-times/ebi`
+
+When you run the tool, it will automatically notify you if there is a newer version of it available for you to update to.
+
+[You can disable notifications](https://www.npmjs.com/package/update-notifier#user-settings) if you'd prefer not to be notified about updates.
+
+## No installation
+
+`npx @financial-times/ebi`
+
+The npx command lets you use this tool without installing it. However, each time you use npx it downloads the whole package from the npm registry, which takes a while. That's why global installation is reccommended.
+
+> Note: If this tool is globally installed, npx @financial-times/ebi will use that globally installed version rather than downloading.
+
 ## Usage
 
 1.  [Set up a GitHub personal access token](#setting-up-your-github-personal-access-token) (with all `repo` scopes) assigned to the `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable
 
 2.  Pass in the list of space-separated repositories as arguments:
 
-        npx ebi <command> Financial-Times/ebi Financial-Times/tako
+        ebi <command> Financial-Times/ebi Financial-Times/tako
 
 ### Examples
 
 Show help
 
-    npx ebi --help
+    ebi --help
 
 Input the repositories to the ebi command either via `stdin` or `args`.
 Determine whether a repo has a `Procfile`
 
 ```
-$ echo -e "Financial-Times/ebi" | npx ebi contents Procfile
+$ echo -e "Financial-Times/ebi" | ebi contents Procfile
 ```
 
 ```
-$ npx ebi contents Procfile Financial-Times/ebi
+$ ebi contents Procfile Financial-Times/ebi
 ```
 
 Find all the `node` engines and their versions in `package.json`
 
 ```
-$ cat repositories.txt | npx ebi package:engines
+$ cat repositories.txt | ebi package:engines
 ```
 
 For more examples see [Usage Examples](https://github.com/Financial-Times/ebi/wiki/Usage-Examples).
 
 ### JSON output
 
-To output as JSON, you can use the `--json` flag eg, `npx ebi package:engines --json`.
+To output as JSON, you can use the `--json` flag eg, `ebi package:engines --json`.
 
 The output format of the JSON is
 
@@ -59,15 +75,15 @@ The output format of the JSON is
 }
 ```
 
-| Field          | Values                            | Description                                                   |
-| -------------- | --------------------------------- | ------------------------------------------------------------- |
-| `type`         | `match`, `error`                  | Type of result. Non matches will be under `error`             |
-| `repository`   | `Financial-Times/ebi`             | The full repository path                                      |
-| `filepath`     | `package.json`                    | The filepath searched for                                     |
-| `fileContents` | `{\n  \"name\": \"ebi\",\n ... }` | The file contents serialized as a string                      |
-| `search`       | `name`                            | [optional] The search term                                    |
-| `regex`        | `no.*`                            | [optional] The regex used for search (ie, `--regex`)          |
-| `error`        | `404 ERROR: ...`                  | [optional] The error message if the result is of type `error` |
+| Field          | Values                           | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| `type`         | `match`, `error`                 | Type of result. Non matches will be under `error`             |
+| `repository`   | `Financial-Times/ebi`            | The full repository path                                      |
+| `filepath`     | `package.json`                   | The filepath searched for                                     |
+| `fileContents` | `{\n \"name\": \"ebi\",\n ... }` | The file contents serialized as a string                      |
+| `search`       | `name`                           | [optional] The search term                                    |
+| `regex`        | `no.*`                           | [optional] The regex used for search (ie, `--regex`)          |
+| `error`        | `404 ERROR: ...`                 | [optional] The error message if the result is of type `error` |
 
 ## Setting up your GitHub personal access token
 
@@ -92,9 +108,6 @@ This tool requires a [GitHub personal access token](https://help.github.com/arti
 
 1.  Run with:
 
-        npx --package . ebi <command>
-
-        # or,
         ./bin/ebi.js <command>
 
 ### Code formatting with Prettier

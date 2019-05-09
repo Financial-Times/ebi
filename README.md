@@ -98,18 +98,15 @@ This tool requires a [GitHub personal access token](https://help.github.com/arti
 
 1.  Install [nvm](https://github.com/creationix/nvm) and use the correct node version
 
-        nvm use
+        `nvm use`
 
 1.  Install dependencies
 
-        npm install
+        `npm install`
 
 1.  Run with:
 
-        npx --package . ebi <command>
-
-        # or,
-        ./bin/ebi.js <command>
+        `./bin/ebi.js <command>`
 
 ### Code formatting with Prettier
 

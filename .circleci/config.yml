@@ -3,7 +3,7 @@ version: 2.1
 executors:
     circleci-node-10:
         docker:
-            - image: circleci/node:10.15.0
+            - image: circleci/node:10.15.3
         working_directory: ~/project/build
 
 commands:

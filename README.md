@@ -10,7 +10,7 @@ Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=h
 
 ## Global installation (recommmended)
 
-`npm install --global @financial-times/ebi`
+`npm install --global ebi`
 
 When you run the tool, it will automatically notify you if there is a newer version of it available for you to update to.
 
@@ -18,11 +18,11 @@ When you run the tool, it will automatically notify you if there is a newer vers
 
 ## No installation
 
-`npx @financial-times/ebi`
+`npx ebi`
 
 The npx command lets you use this tool without installing it. However, each time you use npx it downloads the whole package from the npm registry, which takes a while. That's why global installation is reccommended.
 
-> Note: If this tool is globally installed, npx @financial-times/ebi will use that globally installed version rather than downloading.
+> Note: If this tool is globally installed, npx ebi will use that globally installed version rather than downloading.
 
 ## Usage
 

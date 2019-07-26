@@ -1,8 +1,8 @@
 /*eslint no-console: ["error", { allow: ["log", "error"] }] */
 const { flow } = require('lodash');
 
-const getContents = require('../../lib/get-contents');
-const getRepositories = require('../../lib/get-repositories');
+const { packageSearch } = require('../../lib/ebi/package-search');
+const { ebiLog } = require('../../lib/ebi/ebi-log');
 const {
 	withEpilogue,
 	withToken,
@@ -11,13 +11,6 @@ const {
 	withJson,
 	withRepoList
 } = require('./shared');
-
-const {
-	createResult,
-	withMatchFileContents,
-	withErrorMessage
-} = require('../../lib/create-result');
-const { logText, logJson } = require('../../lib/log-result');
 
 exports.command = 'package [search] [repo..]';
 exports.desc = 'Search within the `package.json` file';
@@ -38,75 +31,21 @@ exports.builder = yargs => {
 	});
 };
 
-exports.handler = async function(argv = {}) {
-	const { token, search, limit, regex, json, repo } = argv;
-	const repoList = repo;
-	const { errors, repositories } = await getRepositories({ limit, repoList });
-	const filepath = 'package.json';
-
-	const getPackageJson = getContents({
-		githubToken: token,
-		filepath
-	});
-
-	errors.forEach(error => {
-		const { repository, line } = error;
-		const result = createResult({
+exports.handler = async function({
+	token,
+	search,
+	limit,
+	regex,
+	json,
+	repo: repoList
+} = {}) {
+	return ebiLog({
+		ebiSearch: packageSearch({
+			token,
 			search,
 			regex,
-			filepath,
-			repository
-		});
-		const message = `ERROR: invalid repository '${repository}' on line ${line}`;
-		const output = result(withErrorMessage(message));
-		return json ? logJson(output) : logText(output);
-	});
-
-	const allRepos = repositories.map(repository => {
-		const result = createResult({
-			search,
-			regex,
-			filepath,
-			repository
-		});
-		return getPackageJson(repository)
-			.then(contents => {
-				const noSearch = !search;
-				const containsSearchItem = contents.includes(search);
-				let output;
-
-				if (regex) {
-					const regExp = new RegExp(regex);
-					const hasMatch = contents.match(regExp);
-
-					if (hasMatch) {
-						output = result(withMatchFileContents(contents));
-					} else {
-						output = result(
-							withErrorMessage(
-								`INFO: '${filepath}' has no match for '${regExp}' in '${repository}'`
-							)
-						);
-					}
-				} else if (noSearch || containsSearchItem) {
-					output = result(withMatchFileContents(contents));
-				} else {
-					output = result(
-						withErrorMessage(
-							`INFO: '${filepath}' has no match for '${search}' in '${repository}'`
-						)
-					);
-				}
-
-				return output;
-			})
-			.then(result => (json ? logJson(result) : logText(result)))
-			.catch(error => {
-				const { message } = error;
-				const output = result(withErrorMessage(message));
-				return json ? logJson(output) : logText(output);
-			});
-	});
-
-	return Promise.all(allRepos);
+			limit
+		}),
+		json
+	})(repoList);
 };

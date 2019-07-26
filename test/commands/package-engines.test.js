@@ -433,6 +433,7 @@ describe('json output', () => {
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
 			type: 'match',
+			textSuffix: 'node@~10.15.0',
 			filepath: 'package.json',
 			engines: packageJson.engines,
 			fileContents: JSON.stringify(packageJson),
@@ -455,6 +456,7 @@ describe('json output', () => {
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
 			type: 'match',
+			textSuffix: 'node@~10.15.0',
 			filepath: 'package.json',
 			search: 'node',
 			engines: packageJson.engines,
@@ -478,6 +480,7 @@ describe('json output', () => {
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
 			type: 'match',
+			textSuffix: 'node@~10.15.0',
 			filepath: 'package.json',
 			regex: 'no.*',
 			engines: packageJson.engines,

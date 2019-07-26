@@ -18,7 +18,7 @@ const {
 	withMatch,
 	withErrorMessage
 } = require('../../lib/create-result');
-const { logText, logTextWithSuffix, logJson } = require('../../lib/log-result');
+const { logText, logJson } = require('../../lib/log-result');
 
 exports.command = 'package:engines [search] [repo..]';
 exports.desc = 'Search `engines` field inside the `package.json` file';
@@ -128,7 +128,12 @@ exports.handler = async function(argv = {}) {
 				const hasEngines = !!Object.keys(engines).length;
 				let output;
 				if (hasEngines) {
-					output = result(withMatch({ engines }));
+					output = result(
+						withMatch({
+							engines,
+							textSuffix: enginesReport(engines)
+						})
+					);
 				} else {
 					output = result(
 						withErrorMessage(
@@ -140,15 +145,7 @@ exports.handler = async function(argv = {}) {
 
 				return output;
 			})
-			.then(result => {
-				if (json) {
-					return logJson(result);
-				} else {
-					return logTextWithSuffix(({ engines }) =>
-						enginesReport(engines)
-					)(result);
-				}
-			})
+			.then(result => (json ? logJson(result) : logText(result)))
 			.catch(error => {
 				const { message } = error;
 				const output = result(withErrorMessage(message));

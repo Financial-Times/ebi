@@ -353,6 +353,34 @@ describe('json output', () => {
 		});
 	});
 
+	test('shows json with no match', async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: {
+				json: true,
+				filepath: 'Procfile',
+				search: 'something-else'
+			},
+			inputType: INPUT_TYPES.STDIN
+		});
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'no-match',
+			filepath: 'Procfile',
+			search: 'something-else',
+			repository: repo,
+			message: expect.stringContaining('no match'),
+			fileContents: 'web: node 1234.js'
+		});
+	});
+
 	test('shows json error', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
 

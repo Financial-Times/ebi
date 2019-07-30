@@ -77,7 +77,7 @@ The output format of the JSON is
 
 | Field          | Values                           | Description                                                   |
 | -------------- | -------------------------------- | ------------------------------------------------------------- |
-| `type`         | `match`, `error`                 | Type of result. Non matches will be under `error`             |
+| `type`         | `match`, `no-match`, `error`     | Type of result                                                |
 | `repository`   | `Financial-Times/ebi`            | The full repository path                                      |
 | `filepath`     | `package.json`                   | The filepath searched for                                     |
 | `fileContents` | `{\n \"name\": \"ebi\",\n ... }` | The file contents serialized as a string                      |

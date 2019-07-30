@@ -305,6 +305,29 @@ describe('json output', () => {
 		});
 	});
 
+	test('shows json with no match', async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'something-else', json: true }
+		});
+
+		const log = JSON.parse(console.log.mock.calls[0][0]);
+		expect(log).toEqual({
+			type: 'no-match',
+			filepath: 'package.json',
+			search: 'something-else',
+			repository: repo,
+			fileContents: JSON.stringify(packageJson),
+			message: expect.stringContaining('no match')
+		});
+	});
+
 	test('shows json error', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(404);
 

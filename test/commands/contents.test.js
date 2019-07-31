@@ -106,13 +106,15 @@ describe('contents command handler', () => {
 		expect(console.error).not.toBeCalled();
 	});
 
-	test('no arguments does nothing', async () => {
+	test('no arguments errors with filepath required', async () => {
 		await initializeContentsHandler({
 			inputType: INPUT_TYPES.STDIN
 		});
 
 		expect(console.log).not.toBeCalled();
-		expect(console.error).not.toBeCalled();
+		expect(console.error).toBeCalledWith(
+			expect.stringContaining(`'filepath' is required`)
+		);
 	});
 
 	test('when contents handler is called with valid <file> and <search> values, a list of repositories are logged', async () => {

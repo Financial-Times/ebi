@@ -4,11 +4,13 @@
 	<img alt="Build Status" src="https://circleci.com/gh/Financial-Times/ebi/tree/master.svg?style=svg">
 </a>
 
-A command line tool that searches files within GitHub repositories.
+Searches files within GitHub repositories. It can be used as a command line tool or a library.
 
 Ebi (えび) is [Japanese for prawn/shrimp](https://translate.google.com/#view=home&op=translate&sl=en&tl=ja&text=Prawn), and intends to be a small little tool to crawl through your sea of code on GitHub, finding you nuggets of information.
 
-## Global installation (recommmended)
+## Command Line Usage
+
+### Global installation (recommmended)
 
 `npm install --global ebi`
 
@@ -84,6 +86,75 @@ The output format of the JSON is
 | `search`       | `name`                           | [optional] The search term                                    |
 | `regex`        | `no.*`                           | [optional] The regex used for search (ie, `--regex`)          |
 | `error`        | `404 ERROR: ...`                 | [optional] The error message if the result is of type `error` |
+
+## Library Usage
+
+To use `ebi` as a library in a NodeJS project:
+
+    npm install ebi
+
+Require `ebi`, and run a search:
+
+```javascript
+const {
+  contentsSearch,
+  packageSearch,
+  packageEnginesSearch
+} = require('ebi');
+
+// Get a repository list
+const repoList = [
+  'Financial-Times/ebi'
+];
+
+const { getResults, resultsAsync } = await contentsSearch({
+  filepath: 'package.json',
+  search,       // Optional
+  token,        // Optional
+  regex,        // Optional
+  limit         // Optional
+})(repoList);
+
+// Get results synchronously
+const {
+    allResults,
+    searchMatches,
+    searchNoMatches,
+    searchErrors
+} = await getResults();
+
+// Get results asynchronously
+const allAsyncResults = await Promise.all(
+    resultsAsync.map(promise => {
+        // Need to handle errors eg, if file is not found
+        return promise.catch(e => e);
+    })
+);
+```
+
+Similarly:
+
+```javascript
+const { getResults, resultsAsync } = await packageSearch({
+  search: 'ebi',  // Optional
+  token,          // Optional
+  regex,          // Optional
+  limit           // Optional
+})(repoList);
+```
+
+```javascript
+const { getResults, resultsAsync } = await packageEnginesSearch({
+  search: 'node'  // Optional
+  token,          // Optional
+  regex,          // Optional
+  limit           // Optional
+})(repoList);
+```
+
+See [JSDoc comments](./lib/ebi/ebi-results.js) for descriptions of the parameters. VS Code also has [JSDoc support in the editor](https://code.visualstudio.com/docs/languages/javascript#_jsdoc-support). To turn it on, either put `// @ts-check` on the top of a file or enable the `checkJS` compiler option.
+
+See [examples](./examples) folder for more usage examples.
 
 ## Setting up your GitHub personal access token
 

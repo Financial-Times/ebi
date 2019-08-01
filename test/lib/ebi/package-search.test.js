@@ -24,7 +24,7 @@ afterAll(() => {
 	process.stdin.isTTY = initialTTY;
 });
 
-describe('packageSearch', () => {
+describe('packageSearch resultsAsync', () => {
 	let packageJson;
 	beforeEach(() => {
 		packageJson = {
@@ -41,7 +41,8 @@ describe('packageSearch', () => {
 		});
 
 		const ebiSearch = packageSearch();
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'package.json',
@@ -64,7 +65,8 @@ describe('packageSearch', () => {
 		const ebiSearch = packageSearch({
 			search: 'ebi'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'package.json',
@@ -87,7 +89,8 @@ describe('packageSearch', () => {
 		const ebiSearch = packageSearch({
 			regex: 'e.i'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'package.json',
@@ -111,7 +114,8 @@ describe('packageSearch', () => {
 			regex: 'e.i',
 			search: 'nope'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'package.json',
@@ -134,7 +138,8 @@ describe('packageSearch', () => {
 		const ebiSearch = packageSearch({
 			search: 'something-else'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			message:
@@ -155,7 +160,8 @@ describe('packageSearch', () => {
 		const ebiSearch = packageSearch({
 			search: 'ebi'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).rejects.toEqual({
 			filepath: 'package.json',
@@ -166,5 +172,115 @@ describe('packageSearch', () => {
 			search: 'ebi',
 			type: 'error'
 		});
+	});
+});
+
+describe('packageSearch getResults', () => {
+	let packageJson;
+	beforeEach(() => {
+		packageJson = {
+			name: 'ebi'
+		};
+	});
+
+	test('search matches', async () => {
+		const repo = 'Financial-Times/ebi';
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+
+		const ebiSearch = packageSearch({
+			search: 'ebi'
+		});
+		const { getResults } = await ebiSearch([repo]);
+		const {
+			allResults,
+			searchMatches,
+			searchNoMatches,
+			searchErrors
+		} = await getResults();
+
+		const expectedResult = {
+			filepath: 'package.json',
+			fileContents: JSON.stringify(packageJson),
+			regex: undefined,
+			repository: 'Financial-Times/ebi',
+			search: 'ebi',
+			type: 'match'
+		};
+
+		expect(allResults).toEqual([expectedResult]);
+		expect(searchMatches).toEqual([expectedResult]);
+		expect(searchNoMatches).toEqual([]);
+		expect(searchErrors).toEqual([]);
+	});
+
+	test('search no matches', async () => {
+		const repo = 'Financial-Times/ebi';
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj(packageJson),
+			path: 'package.json'
+		});
+
+		const ebiSearch = packageSearch({
+			search: 'something-else'
+		});
+		const { getResults } = await ebiSearch([repo]);
+		const {
+			allResults,
+			searchMatches,
+			searchNoMatches,
+			searchErrors
+		} = await getResults();
+
+		const expectedResult = {
+			filepath: 'package.json',
+			fileContents: JSON.stringify(packageJson),
+			message:
+				"INFO: 'package.json' has no match for 'something-else' in 'Financial-Times/ebi'",
+			regex: undefined,
+			repository: 'Financial-Times/ebi',
+			search: 'something-else',
+			type: 'no-match'
+		};
+
+		expect(allResults).toEqual([expectedResult]);
+		expect(searchMatches).toEqual([]);
+		expect(searchNoMatches).toEqual([expectedResult]);
+		expect(searchErrors).toEqual([]);
+	});
+
+	test('search errors', async () => {
+		const repo = 'Financial-Times/ebi';
+		nockScope.get(`/${repo}/contents/package.json`).reply(404);
+
+		const ebiSearch = packageSearch({
+			search: 'something'
+		});
+		const { getResults } = await ebiSearch([repo]);
+		const {
+			allResults,
+			searchMatches,
+			searchNoMatches,
+			searchErrors
+		} = await getResults();
+
+		const expectedResult = {
+			filepath: 'package.json',
+			error:
+				"404 ERROR: file 'package.json' not found in 'Financial-Times/ebi'",
+			regex: undefined,
+			repository: 'Financial-Times/ebi',
+			search: 'something',
+			type: 'error'
+		};
+
+		expect(allResults).toEqual([expectedResult]);
+		expect(searchMatches).toEqual([]);
+		expect(searchNoMatches).toEqual([]);
+		expect(searchErrors).toEqual([expectedResult]);
 	});
 });

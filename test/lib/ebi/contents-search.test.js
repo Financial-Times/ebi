@@ -24,7 +24,7 @@ afterAll(() => {
 	process.stdin.isTTY = initialTTY;
 });
 
-describe('contentsSearch', () => {
+describe('contentsSearch resultsAsync', () => {
 	test('empty filepath', async () => {
 		const repo = 'Financial-Times/ebi';
 		await expect(contentsSearch()([repo])).rejects.toThrow(
@@ -44,7 +44,8 @@ describe('contentsSearch', () => {
 			search: 'web:',
 			filepath: 'Procfile'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'Procfile',
@@ -68,7 +69,8 @@ describe('contentsSearch', () => {
 			regex: 'w..:',
 			filepath: 'Procfile'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'Procfile',
@@ -93,7 +95,8 @@ describe('contentsSearch', () => {
 			search: 'nope',
 			filepath: 'Procfile'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			filepath: 'Procfile',
@@ -117,7 +120,8 @@ describe('contentsSearch', () => {
 			search: 'node',
 			filepath: 'Procfile'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).resolves.toEqual({
 			message:
@@ -139,7 +143,8 @@ describe('contentsSearch', () => {
 			search: 'web:',
 			filepath: 'Procfile'
 		});
-		const [result] = await ebiSearch([repo]);
+		const { resultsAsync } = await ebiSearch([repo]);
+		const [result] = resultsAsync;
 
 		await expect(result).rejects.toEqual({
 			filepath: 'Procfile',
@@ -150,5 +155,111 @@ describe('contentsSearch', () => {
 			search: 'web:',
 			type: 'error'
 		});
+	});
+});
+
+describe('contentsSearch getResults', () => {
+	test('search matches', async () => {
+		const repo = 'Financial-Times/ebi';
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: n-cluster server/init.js'),
+			path: 'Procfile'
+		});
+
+		const ebiSearch = contentsSearch({
+			search: 'web:',
+			filepath: 'Procfile'
+		});
+		const { getResults } = await ebiSearch([repo]);
+		const {
+			allResults,
+			searchMatches,
+			searchNoMatches,
+			searchErrors
+		} = await getResults();
+
+		const expectedResult = {
+			filepath: 'Procfile',
+			fileContents: 'web: n-cluster server/init.js',
+			regex: undefined,
+			repository: 'Financial-Times/ebi',
+			search: 'web:',
+			type: 'match'
+		};
+
+		expect(allResults).toEqual([expectedResult]);
+		expect(searchMatches).toEqual([expectedResult]);
+		expect(searchNoMatches).toEqual([]);
+		expect(searchErrors).toEqual([]);
+	});
+
+	test('search no matches', async () => {
+		const repo = 'Financial-Times/ebi';
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: n-cluster server/init.js'),
+			path: 'Procfile'
+		});
+
+		const ebiSearch = contentsSearch({
+			search: 'something-else',
+			filepath: 'Procfile'
+		});
+		const { getResults } = await ebiSearch([repo]);
+		const {
+			allResults,
+			searchMatches,
+			searchNoMatches,
+			searchErrors
+		} = await getResults();
+
+		const expectedResult = {
+			filepath: 'Procfile',
+			fileContents: 'web: n-cluster server/init.js',
+			regex: undefined,
+			repository: 'Financial-Times/ebi',
+			message:
+				"INFO: 'Procfile' has no match for 'something-else' in 'Financial-Times/ebi'",
+			search: 'something-else',
+			type: 'no-match'
+		};
+
+		expect(allResults).toEqual([expectedResult]);
+		expect(searchMatches).toEqual([]);
+		expect(searchNoMatches).toEqual([expectedResult]);
+		expect(searchErrors).toEqual([]);
+	});
+
+	test('search errors', async () => {
+		const repo = 'Financial-Times/ebi';
+		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
+
+		const ebiSearch = contentsSearch({
+			search: 'something',
+			filepath: 'Procfile'
+		});
+		const { getResults } = await ebiSearch([repo]);
+		const {
+			allResults,
+			searchMatches,
+			searchNoMatches,
+			searchErrors
+		} = await getResults();
+
+		const expectedResult = {
+			filepath: 'Procfile',
+			regex: undefined,
+			repository: 'Financial-Times/ebi',
+			error:
+				"404 ERROR: file 'Procfile' not found in 'Financial-Times/ebi'",
+			search: 'something',
+			type: 'error'
+		};
+
+		expect(allResults).toEqual([expectedResult]);
+		expect(searchMatches).toEqual([]);
+		expect(searchNoMatches).toEqual([]);
+		expect(searchErrors).toEqual([expectedResult]);
 	});
 });

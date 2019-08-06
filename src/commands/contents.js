@@ -36,7 +36,7 @@ exports.builder = yargs => {
 		});
 };
 
-exports.handler = async ({
+exports.handler = ({
 	filepath,
 	token,
 	search,

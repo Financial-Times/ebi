@@ -32,7 +32,7 @@ exports.builder = yargs => {
 	});
 };
 
-exports.handler = async function({
+exports.handler = function({
 	token,
 	limit,
 	search,

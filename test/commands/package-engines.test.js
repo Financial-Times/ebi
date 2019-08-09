@@ -6,6 +6,7 @@ const { base64EncodeObj } = require('../helpers/base64');
 const {
 	handler: packageEnginesHandler
 } = require('../../src/commands/package-engines');
+const { RESULT_TYPES } = require('../../lib/ebi/result-types');
 const repo = 'Financial-Times/next-front-page';
 
 let nockScope;
@@ -56,7 +57,7 @@ describe('Log error for invalid repository', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'error',
+			type: RESULT_TYPES.error,
 			filepath: 'package.json',
 			repository: invalidRepository,
 			error: expect.stringContaining('invalid repository')
@@ -432,7 +433,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			textSuffix: 'node@~10.15.0',
 			filepath: 'package.json',
 			engines: packageJson.engines,
@@ -455,7 +456,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			textSuffix: 'node@~10.15.0',
 			filepath: 'package.json',
 			search: 'node',
@@ -479,7 +480,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			textSuffix: 'node@~10.15.0',
 			filepath: 'package.json',
 			regex: 'no.*',
@@ -503,7 +504,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'no-match',
+			type: RESULT_TYPES.noMatch,
 			filepath: 'package.json',
 			search: 'something-else',
 			fileContents: JSON.stringify(packageJson),
@@ -522,7 +523,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'error',
+			type: RESULT_TYPES.error,
 			filepath: 'package.json',
 			repository: repo,
 			error: expect.stringContaining('not found')

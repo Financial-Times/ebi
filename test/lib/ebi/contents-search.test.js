@@ -2,6 +2,7 @@ const nock = require('nock');
 
 const { base64Encode } = require('../../helpers/base64');
 const { contentsSearch } = require('../../../lib/ebi/contents-search');
+const { RESULT_TYPES } = require('../../../lib/ebi/result-types');
 
 let nockScope;
 let initialTTY;
@@ -53,7 +54,7 @@ describe('contentsSearch resultsAsync', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'web:',
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -78,7 +79,7 @@ describe('contentsSearch resultsAsync', () => {
 			regex: 'w..:',
 			repository: 'Financial-Times/ebi',
 			search: undefined,
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -104,7 +105,7 @@ describe('contentsSearch resultsAsync', () => {
 			regex: 'w..:',
 			repository: 'Financial-Times/ebi',
 			search: 'nope',
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -131,7 +132,7 @@ describe('contentsSearch resultsAsync', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'node',
-			type: 'no-match'
+			type: RESULT_TYPES.noMatch
 		});
 	});
 
@@ -153,7 +154,7 @@ describe('contentsSearch resultsAsync', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'web:',
-			type: 'error'
+			type: RESULT_TYPES.error
 		});
 	});
 });
@@ -185,7 +186,7 @@ describe('contentsSearch getResults', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'web:',
-			type: 'match'
+			type: RESULT_TYPES.match
 		};
 
 		expect(allResults).toEqual([expectedResult]);
@@ -222,7 +223,7 @@ describe('contentsSearch getResults', () => {
 			message:
 				"INFO: 'Procfile' has no match for 'something-else' in 'Financial-Times/ebi'",
 			search: 'something-else',
-			type: 'no-match'
+			type: RESULT_TYPES.noMatch
 		};
 
 		expect(allResults).toEqual([expectedResult]);
@@ -254,7 +255,7 @@ describe('contentsSearch getResults', () => {
 			error:
 				"404 ERROR: file 'Procfile' not found in 'Financial-Times/ebi'",
 			search: 'something',
-			type: 'error'
+			type: RESULT_TYPES.error
 		};
 
 		expect(allResults).toEqual([expectedResult]);

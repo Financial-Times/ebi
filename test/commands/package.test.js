@@ -4,6 +4,7 @@ const nock = require('nock');
 const setupReadline = require('../helpers/setup-readline');
 const { base64EncodeObj } = require('../helpers/base64');
 const { handler: packageHandler } = require('../../src/commands/package');
+const { RESULT_TYPES } = require('../../lib/ebi/result-types');
 const repo = 'Financial-Times/next-front-page';
 
 let nockScope;
@@ -55,7 +56,7 @@ describe('Log error for invalid repository', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'error',
+			type: RESULT_TYPES.error,
 			filepath: 'package.json',
 			search: 'something',
 			repository: invalidRepository,
@@ -254,7 +255,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			filepath: 'package.json',
 			repository: repo,
 			fileContents: JSON.stringify(packageJson)
@@ -275,7 +276,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			filepath: 'package.json',
 			search: 'name',
 			repository: repo,
@@ -297,7 +298,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			filepath: 'package.json',
 			regex: 'front-.*',
 			repository: repo,
@@ -319,7 +320,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'no-match',
+			type: RESULT_TYPES.noMatch,
 			filepath: 'package.json',
 			search: 'something-else',
 			repository: repo,
@@ -338,7 +339,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'error',
+			type: RESULT_TYPES.error,
 			filepath: 'package.json',
 			repository: repo,
 			search: 'something',

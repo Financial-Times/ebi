@@ -5,6 +5,7 @@ const setupReadline = require('../helpers/setup-readline');
 const { base64Encode } = require('../helpers/base64');
 const { handler: contentsHandler } = require('../../src/commands/contents');
 const repo = 'Financial-Times/next-front-page';
+const { RESULT_TYPES } = require('../../lib/ebi/result-types');
 
 let nockScope;
 
@@ -82,7 +83,7 @@ describe('Log error for invalid repository', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'error',
+			type: RESULT_TYPES.error,
 			filepath: 'Procfile',
 			search: 'node',
 			repository: invalidRepository,
@@ -302,7 +303,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			filepath: 'Procfile',
 			repository: repo,
 			fileContents: 'web: node 1234.js'
@@ -324,7 +325,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			filepath: 'Procfile',
 			search: 'node',
 			repository: repo,
@@ -347,7 +348,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'match',
+			type: RESULT_TYPES.match,
 			filepath: 'Procfile',
 			regex: 'node',
 			repository: repo,
@@ -374,7 +375,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'no-match',
+			type: RESULT_TYPES.noMatch,
 			filepath: 'Procfile',
 			search: 'something-else',
 			repository: repo,
@@ -394,7 +395,7 @@ describe('json output', () => {
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);
 		expect(log).toEqual({
-			type: 'error',
+			type: RESULT_TYPES.error,
 			filepath: 'Procfile',
 			repository: repo,
 			error: expect.stringContaining('not found')

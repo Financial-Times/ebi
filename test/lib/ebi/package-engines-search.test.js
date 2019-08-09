@@ -4,6 +4,7 @@ const { base64EncodeObj } = require('../../helpers/base64');
 const {
 	packageEnginesSearch
 } = require('../../../lib/ebi/package-engines-search');
+const { RESULT_TYPES } = require('../../../lib/ebi/result-types');
 
 let nockScope;
 let initialTTY;
@@ -56,7 +57,7 @@ describe('packageEnginesSearch resultsAsync', () => {
 			engines: packageJson.engines,
 			repository: 'Financial-Times/ebi',
 			search: undefined,
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -82,7 +83,7 @@ describe('packageEnginesSearch resultsAsync', () => {
 			engines: packageJson.engines,
 			repository: 'Financial-Times/ebi',
 			search: 'node',
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -108,7 +109,7 @@ describe('packageEnginesSearch resultsAsync', () => {
 			engines: packageJson.engines,
 			repository: 'Financial-Times/ebi',
 			search: undefined,
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -135,7 +136,7 @@ describe('packageEnginesSearch resultsAsync', () => {
 			engines: packageJson.engines,
 			repository: 'Financial-Times/ebi',
 			search: 'nope',
-			type: 'match'
+			type: RESULT_TYPES.match
 		});
 	});
 
@@ -161,7 +162,7 @@ describe('packageEnginesSearch resultsAsync', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'something-else',
-			type: 'no-match'
+			type: RESULT_TYPES.noMatch
 		});
 	});
 
@@ -182,7 +183,7 @@ describe('packageEnginesSearch resultsAsync', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'ebi',
-			type: 'error'
+			type: RESULT_TYPES.error
 		});
 	});
 });
@@ -224,7 +225,7 @@ describe('packageEnginesSearch getResults', () => {
 			engines: packageJson.engines,
 			repository: 'Financial-Times/ebi',
 			search: 'node',
-			type: 'match'
+			type: RESULT_TYPES.match
 		};
 
 		expect(allResults).toEqual([expectedResult]);
@@ -260,7 +261,7 @@ describe('packageEnginesSearch getResults', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'something-else',
-			type: 'no-match'
+			type: RESULT_TYPES.noMatch
 		};
 
 		expect(allResults).toEqual([expectedResult]);
@@ -291,7 +292,7 @@ describe('packageEnginesSearch getResults', () => {
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'something',
-			type: 'error'
+			type: RESULT_TYPES.error
 		};
 
 		expect(allResults).toEqual([expectedResult]);

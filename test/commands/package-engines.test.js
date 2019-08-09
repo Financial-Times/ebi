@@ -36,12 +36,15 @@ afterEach(() => {
 	jest.resetAllMocks();
 });
 
-describe('Log error for invalid repository', () => {
+describe('Log error for invalid repository (with verbose flag)', () => {
 	const invalidRepository = 'something-invalid';
 
 	test(`'${invalidRepository}'`, async () => {
 		await initializeHandlerForStdin({
-			repos: [invalidRepository]
+			repos: [invalidRepository],
+			args: {
+				verbose: true
+			}
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -85,7 +88,7 @@ describe('package:engines command handler', () => {
 		expect(console.error).not.toBeCalled();
 	});
 
-	test('repository not found', async () => {
+	test('repository not found (with verbose flag)', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
 
 		nockScope.get(`/${invalidRepo}/contents/package.json`).reply(404, {
@@ -93,7 +96,8 @@ describe('package:engines command handler', () => {
 		});
 
 		await initializeHandlerForStdin({
-			repos: [invalidRepo]
+			repos: [invalidRepo],
+			args: { verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -268,7 +272,7 @@ describe('package:engines command handler', () => {
 		expect(console.log).not.toBeCalled();
 	});
 
-	test('engines value not found in package.json logs to console error', async () => {
+	test('engines value not found in package.json logs to console error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({}),
@@ -276,7 +280,8 @@ describe('package:engines command handler', () => {
 		});
 
 		await initializeHandlerForStdin({
-			repos: [repo]
+			repos: [repo],
+			args: { verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -284,7 +289,7 @@ describe('package:engines command handler', () => {
 		);
 	});
 
-	test('engines search not found in package.json, logs info message in console error', async () => {
+	test('engines search not found in package.json, logs info message in console error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({ engines: {} }),
@@ -292,7 +297,8 @@ describe('package:engines command handler', () => {
 		});
 
 		await initializeHandlerForStdin({
-			repos: [repo]
+			repos: [repo],
+			args: { verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
@@ -301,7 +307,7 @@ describe('package:engines command handler', () => {
 		);
 	});
 
-	test('package.json not valid JSON', async () => {
+	test('package.json not valid JSON (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: 'something-invalid',
@@ -309,7 +315,8 @@ describe('package:engines command handler', () => {
 		});
 
 		await initializeHandlerForStdin({
-			repos: [repo]
+			repos: [repo],
+			args: { verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -359,7 +366,7 @@ describe('package:engines command handler', () => {
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
 	});
 
-	test('regex is not matched, logs error', async () => {
+	test('regex is not matched, logs error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -373,7 +380,8 @@ describe('package:engines command handler', () => {
 		await initializeHandlerForStdin({
 			repos: [repo],
 			args: {
-				regex: 'something$'
+				regex: 'something$',
+				verbose: true
 			}
 		});
 
@@ -384,7 +392,7 @@ describe('package:engines command handler', () => {
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
 	});
 
-	test('regex is used if search term also exists', async () => {
+	test('regex is used if search term also exists (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -399,7 +407,8 @@ describe('package:engines command handler', () => {
 			repos: [repo],
 			args: {
 				regex: 'something-else',
-				search: 'node'
+				search: 'node',
+				verbose: true
 			}
 		});
 

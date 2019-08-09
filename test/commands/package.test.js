@@ -37,10 +37,10 @@ afterEach(() => {
 describe('Log error for invalid repository', () => {
 	const invalidRepository = 'something-invalid';
 
-	test(`'${invalidRepository}'`, async () => {
+	test(`'${invalidRepository}' (with verbose flag)`, async () => {
 		await initializeHandlerForStdin({
 			repos: [invalidRepository],
-			args: { search: 'something' }
+			args: { search: 'something', verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -65,6 +65,36 @@ describe('Log error for invalid repository', () => {
 	});
 });
 
+describe('Do not log info and errors by default', () => {
+	const invalidRepository = 'something-invalid';
+
+	test(`for error'`, async () => {
+		await initializeHandlerForStdin({
+			repos: [invalidRepository],
+			args: { search: 'something' }
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+
+	test(`for info message`, async () => {
+		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
+			type: 'file',
+			content: base64EncodeObj({}),
+			path: 'package.json'
+		});
+
+		await initializeHandlerForStdin({
+			repos: [repo],
+			args: { search: 'something-else' }
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+});
+
 describe('package command handler', () => {
 	test('ignore empty string repositories', async () => {
 		await initializeHandlerForStdin({
@@ -85,7 +115,7 @@ describe('package command handler', () => {
 		expect(console.error).not.toBeCalled();
 	});
 
-	test('repository not found', async () => {
+	test('repository not found (with verbose flag)', async () => {
 		const invalidRepo = 'Financial-Times/invalid';
 		nockScope.get(`/${invalidRepo}/contents/package.json`).reply(404, {
 			message: 'Not Found'
@@ -93,7 +123,7 @@ describe('package command handler', () => {
 
 		await initializeHandlerForStdin({
 			repos: [invalidRepo],
-			args: { search: 'something' }
+			args: { search: 'something', verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(
@@ -152,7 +182,7 @@ describe('package command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
-	test('<search> value not found, logs info message in console error', async () => {
+	test('<search> value not found, logs info message in console error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -163,7 +193,7 @@ describe('package command handler', () => {
 
 		await initializeHandlerForStdin({
 			repos: [repo],
-			args: { search: 'something-else' }
+			args: { search: 'something-else', verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
@@ -192,7 +222,7 @@ describe('package command handler', () => {
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
 	});
 
-	test('regex is not matched, logs error', async () => {
+	test('regex is not matched, logs error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -203,7 +233,7 @@ describe('package command handler', () => {
 
 		await initializeHandlerForStdin({
 			repos: [repo],
-			args: { regex: 'something$' }
+			args: { regex: 'something$', verbose: true }
 		});
 
 		expect(console.log).not.toBeCalled();
@@ -213,7 +243,7 @@ describe('package command handler', () => {
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
 	});
 
-	test('regex is used if search term also exists', async () => {
+	test('regex is used if search term also exists (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/package.json`).reply(200, {
 			type: 'file',
 			content: base64EncodeObj({
@@ -224,7 +254,7 @@ describe('package command handler', () => {
 
 		await initializeHandlerForStdin({
 			repos: [repo],
-			args: { regex: 'something-else', search: 'front' }
+			args: { regex: 'something-else', search: 'front', verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(

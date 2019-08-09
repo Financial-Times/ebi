@@ -56,11 +56,19 @@ const withRepoList = yargs => {
 	});
 };
 
+const withVerbose = yargs => {
+	return yargs.option('verbose', {
+		type: 'boolean',
+		describe: 'Show all info and error messages. Ignored if outputting JSON'
+	});
+};
+
 module.exports = {
 	withEpilogue,
 	withLimit,
 	withToken,
 	withRegex,
 	withJson,
-	withRepoList
+	withRepoList,
+	withVerbose
 };

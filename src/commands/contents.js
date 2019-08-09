@@ -8,7 +8,8 @@ const {
 	withLimit,
 	withRegex,
 	withJson,
-	withRepoList
+	withRepoList,
+	withVerbose
 } = require('./shared');
 
 exports.command = 'contents <filepath> [search] [repo..]';
@@ -22,7 +23,8 @@ exports.builder = yargs => {
 		withRegex,
 		withToken,
 		withLimit,
-		withRepoList
+		withRepoList,
+		withVerbose
 	]);
 	return baseConfig(yargs)
 		.positional('filepath', {
@@ -43,6 +45,7 @@ exports.handler = ({
 	regex,
 	limit,
 	json,
+	verbose,
 	repo: repoList
 } = {}) => {
 	return ebiLog({
@@ -53,6 +56,7 @@ exports.handler = ({
 			regex,
 			limit
 		}),
-		json
+		json,
+		verbose
 	})(repoList);
 };

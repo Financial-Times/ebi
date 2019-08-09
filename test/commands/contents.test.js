@@ -55,13 +55,14 @@ const initializeContentsHandler = ({ repos = [], args, inputType }) => {
 describe('Log error for invalid repository', () => {
 	const invalidRepository = 'something-invalid';
 
-	test(`'${invalidRepository}'`, async () => {
+	test(`'${invalidRepository}' (with verbose flag)`, async () => {
 		await initializeContentsHandler({
 			repos: [invalidRepository],
 			inputType: INPUT_TYPES.STDIN,
 			args: {
 				filepath: 'Procfile',
-				search: 'node'
+				search: 'node',
+				verbose: true
 			}
 		});
 
@@ -70,7 +71,7 @@ describe('Log error for invalid repository', () => {
 		);
 	});
 
-	test(`'${invalidRepository}' in json`, async () => {
+	test(`'${invalidRepository}' in json (with verbose flag)`, async () => {
 		await initializeContentsHandler({
 			repos: [invalidRepository],
 			inputType: INPUT_TYPES.STDIN,
@@ -92,6 +93,44 @@ describe('Log error for invalid repository', () => {
 	});
 });
 
+describe('Do not log info and errors by default', () => {
+	const invalidRepository = 'something-invalid';
+
+	test(`for error`, async () => {
+		await initializeContentsHandler({
+			repos: [invalidRepository],
+			inputType: INPUT_TYPES.STDIN,
+			args: {
+				filepath: 'Procfile',
+				search: 'node'
+			}
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+
+	test(`for info message`, async () => {
+		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
+			type: 'file',
+			content: base64Encode('web: node 1234.js'),
+			path: 'Procfile'
+		});
+
+		await initializeContentsHandler({
+			repos: [repo],
+			args: {
+				filepath: 'Procfile',
+				search: 'something-else'
+			},
+			inputType: INPUT_TYPES.STDIN
+		});
+
+		expect(console.log).not.toBeCalled();
+		expect(console.error).not.toBeCalled();
+	});
+});
+
 describe('contents command handler', () => {
 	test('ignore empty string repositories', async () => {
 		await initializeContentsHandler({
@@ -107,9 +146,12 @@ describe('contents command handler', () => {
 		expect(console.error).not.toBeCalled();
 	});
 
-	test('no arguments errors with filepath required', async () => {
+	test('no arguments (apart from verbose flag) errors with filepath required', async () => {
 		await initializeContentsHandler({
-			inputType: INPUT_TYPES.STDIN
+			inputType: INPUT_TYPES.STDIN,
+			args: {
+				verbose: true
+			}
 		});
 
 		expect(console.log).not.toBeCalled();
@@ -149,14 +191,14 @@ describe('contents command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
-	test('when `contents` command is used with an invalid <file> filepath, the relevant error is logged', async () => {
+	test('when `contents` command is used with an invalid <file> filepath, the relevant error is logged (with verbose flag)', async () => {
 		nockScope
 			.get(`/${repo}/contents/server`)
 			.reply(200, [{ path: 'app.js' }, { path: 'libs' }]);
 
 		await initializeContentsHandler({
 			repos: [repo],
-			args: { filepath: 'server', search: 'app' },
+			args: { filepath: 'server', search: 'app', verbose: true },
 			inputType: INPUT_TYPES.STDIN
 		});
 
@@ -180,12 +222,12 @@ describe('contents command handler', () => {
 		expect(console.log).toBeCalledWith('Financial-Times/next-front-page');
 	});
 
-	test('logs error if file does not exist', async () => {
+	test('logs error if file does not exist (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
 
 		await initializeContentsHandler({
 			repos: [repo],
-			args: { filepath: 'Procfile', search: 'something' },
+			args: { filepath: 'Procfile', search: 'something', verbose: true },
 			inputType: INPUT_TYPES.STDIN
 		});
 
@@ -195,12 +237,12 @@ describe('contents command handler', () => {
 		);
 	});
 
-	test('logs error if file does not exist (with no search)', async () => {
+	test('logs error if file does not exist (with no search, and verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
 
 		await initializeHandlerForStdin({
 			repos: [repo],
-			args: { filepath: 'Procfile' }
+			args: { filepath: 'Procfile', verbose: true }
 		});
 
 		expect(console.error).toBeCalledWith(expect.stringContaining('ERROR'));
@@ -209,7 +251,7 @@ describe('contents command handler', () => {
 		);
 	});
 
-	test('<search> value not found, does not log', async () => {
+	test('<search> value not found, does not log (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
 			content: base64Encode('web: n-cluster server/init.js'),
@@ -218,7 +260,11 @@ describe('contents command handler', () => {
 
 		await initializeContentsHandler({
 			repos: [repo],
-			args: { filepath: 'Procfile', search: 'something-else' },
+			args: {
+				filepath: 'Procfile',
+				search: 'something-else',
+				verbose: true
+			},
 			inputType: INPUT_TYPES.STDIN
 		});
 
@@ -244,7 +290,7 @@ describe('contents command handler', () => {
 		expect(console.log).toBeCalledWith(expect.stringContaining(repo));
 	});
 
-	test('regex is not matched, logs error', async () => {
+	test('regex is not matched, logs error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
 			content: base64Encode('web: node 1234.js'),
@@ -253,7 +299,11 @@ describe('contents command handler', () => {
 
 		await initializeContentsHandler({
 			repos: [repo],
-			args: { filepath: 'Procfile', regex: 'something.js$' },
+			args: {
+				filepath: 'Procfile',
+				regex: 'something.js$',
+				verbose: true
+			},
 			inputType: INPUT_TYPES.STDIN
 		});
 
@@ -264,7 +314,7 @@ describe('contents command handler', () => {
 		expect(console.error).toBeCalledWith(expect.stringContaining(repo));
 	});
 
-	test('regex is used if search term also exists', async () => {
+	test('regex is used if search term also exists (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
 			content: base64Encode('web: node 1234.js'),
@@ -276,7 +326,8 @@ describe('contents command handler', () => {
 			args: {
 				filepath: 'Procfile',
 				regex: 'something-else',
-				search: 'node'
+				search: 'node',
+				verbose: true
 			},
 			inputType: INPUT_TYPES.STDIN
 		});
@@ -356,7 +407,7 @@ describe('json output', () => {
 		});
 	});
 
-	test('shows json with no match', async () => {
+	test('shows json with no match (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
 			content: base64Encode('web: node 1234.js'),
@@ -368,7 +419,8 @@ describe('json output', () => {
 			args: {
 				json: true,
 				filepath: 'Procfile',
-				search: 'something-else'
+				search: 'something-else',
+				verbose: true
 			},
 			inputType: INPUT_TYPES.STDIN
 		});
@@ -384,13 +436,14 @@ describe('json output', () => {
 		});
 	});
 
-	test('shows json error', async () => {
+	test('shows json error (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(404);
 
 		await initializeContentsHandler({
 			repos: [repo],
 			args: { json: true, filepath: 'Procfile' },
-			inputType: INPUT_TYPES.STDIN
+			inputType: INPUT_TYPES.STDIN,
+			verbose: true
 		});
 
 		const log = JSON.parse(console.log.mock.calls[0][0]);

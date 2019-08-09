@@ -11,7 +11,8 @@ const {
 	withLimit,
 	withRegex,
 	withJson,
-	withRepoList
+	withRepoList,
+	withVerbose
 } = require('./shared');
 
 exports.command = 'package:engines [search] [repo..]';
@@ -24,7 +25,8 @@ exports.builder = yargs => {
 		withRegex,
 		withToken,
 		withLimit,
-		withRepoList
+		withRepoList,
+		withVerbose
 	]);
 	return baseConfig(yargs).positional('search', {
 		type: 'string',
@@ -38,6 +40,7 @@ exports.handler = function({
 	search,
 	regex,
 	json,
+	verbose,
 	repo: repoList
 } = {}) {
 	return ebiLog({
@@ -47,6 +50,7 @@ exports.handler = function({
 			regex,
 			limit
 		}),
-		json
+		json,
+		verbose
 	})(repoList);
 };

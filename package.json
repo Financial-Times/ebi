@@ -49,7 +49,7 @@
 		"lodash": "^4.17.11",
 		"nock": "^10.0.6",
 		"update-notifier": "^3.0.0",
-		"yargs": "^13.1.0"
+		"yargs": "^14.0.0"
 	},
 	"devDependencies": {
 		"eslint": "^5.16.0",

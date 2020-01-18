@@ -44,7 +44,7 @@
 		}
 	},
 	"dependencies": {
-		"@octokit/plugin-throttling": "^2.4.0",
+		"@octokit/plugin-throttling": "^3.0.0",
 		"@octokit/rest": "^16.15.0",
 		"lodash": "^4.17.11",
 		"nock": "^11.0.0",

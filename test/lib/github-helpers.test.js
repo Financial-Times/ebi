@@ -4,7 +4,7 @@ const {
 } = require('../../lib/github-helpers');
 
 const expectedOwner = 'github-organization';
-const expectedRepo = 'github-repo-name';
+const expectedRepo = 'github-repo.name';
 
 const supportedRepoStrings = SUPPORTED_REPO_STRING_PATTERNS;
 

@@ -47,7 +47,7 @@
 		"@octokit/plugin-throttling": "^2.4.0",
 		"@octokit/rest": "^16.15.0",
 		"lodash": "^4.17.11",
-		"nock": "^11.0.0",
+		"nock": "^12.0.0",
 		"update-notifier": "^4.0.0",
 		"yargs": "^14.0.0"
 	},

@@ -1,5 +1,3 @@
+# See https://help.github.com/articles/about-codeowners/ for more information about this file.
 
-# See https://help.github.com/articles/about-codeowners/ for more information
-# about this file.
-
-*      jennifer.johnson@ft.com jennifer.shepherd@ft.com tak.tran@ft.com
+* @financial-times/platforms

@@ -1,62 +1,62 @@
 {
-	"name": "ebi",
-	"version": "0.0.0",
-	"description": "A command line tool that searches files within GitHub repositories",
-	"bin": "./bin/ebi.js",
-	"main": "./lib/ebi/index.js",
-	"scripts": {
-		"lint": "eslint *.js src/ lib/ test/",
-		"lint-fix": "eslint --fix *.js src/ lib/ test/",
-		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
-		"test": "npm run lint && npm run unit-test",
-		"unit-test": "jest",
-		"unit-test:watch": "jest --watch"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Financial-Times/ebi.git"
-	},
-	"contributors": [
-		{
-			"name": "Jennifer Johnson",
-			"email": "jennifer.johnson@ft.com"
-		},
-		{
-			"name": "Jennifer Shepherd",
-			"email": "jennifer.shepherd@ft.com"
-		},
-		{
-			"name": "Tak Tran",
-			"email": "tak.tran@ft.com"
-		}
-	],
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/Financial-Times/ebi/issues"
-	},
-	"homepage": "https://github.com/Financial-Times/ebi#readme",
-	"engines": {
-		"node": "^8.16.0 || ^10.15.3"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "npm run lint"
-		}
-	},
-	"dependencies": {
-		"@octokit/plugin-throttling": "^2.4.0",
-		"@octokit/rest": "^16.15.0",
-		"lodash": "^4.17.11",
-		"nock": "^11.0.0",
-		"update-notifier": "^4.0.0",
-		"yargs": "^14.0.0"
-	},
-	"devDependencies": {
-		"eslint": "^5.16.0",
-		"eslint-config-prettier": "^4.0.0",
-		"eslint-plugin-no-only-tests": "^2.1.0",
-		"husky": "^2.0.0",
-		"jest": "^24.8.0",
-		"prettier": "1.17.0"
-	}
+  "name": "ebi",
+  "version": "0.0.0",
+  "description": "A command line tool that searches files within GitHub repositories",
+  "bin": "./bin/ebi.js",
+  "main": "./lib/ebi/index.js",
+  "scripts": {
+    "lint": "eslint *.js src/ lib/ test/",
+    "lint-fix": "eslint --fix *.js src/ lib/ test/",
+    "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
+    "test": "npm run lint && npm run unit-test",
+    "unit-test": "jest",
+    "unit-test:watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Financial-Times/ebi.git"
+  },
+  "contributors": [
+    {
+      "name": "Jennifer Johnson",
+      "email": "jennifer.johnson@ft.com"
+    },
+    {
+      "name": "Jennifer Shepherd",
+      "email": "jennifer.shepherd@ft.com"
+    },
+    {
+      "name": "Tak Tran",
+      "email": "tak.tran@ft.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Financial-Times/ebi/issues"
+  },
+  "homepage": "https://github.com/Financial-Times/ebi#readme",
+  "engines": {
+    "node": "14.x"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "dependencies": {
+    "@octokit/plugin-throttling": "^2.4.0",
+    "@octokit/rest": "^16.15.0",
+    "lodash": "^4.17.11",
+    "nock": "^11.0.0",
+    "update-notifier": "^4.0.0",
+    "yargs": "^14.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-no-only-tests": "^2.1.0",
+    "husky": "^2.0.0",
+    "jest": "^24.8.0",
+    "prettier": "1.17.0"
+  }
 }

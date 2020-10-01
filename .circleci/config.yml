@@ -1,15 +1,10 @@
 version: 2.1
 
 executors:
-    circleci-node-10:
+    container_config_node14:
         docker:
             - image: circleci/node:14-browsers
-        working_directory: ~/project/build-node-10
-
-    circleci-node-8:
-        docker:
-            - image: circleci/node:8
-        working_directory: ~/project/build-node-8
+        working_directory: ~/project/build-node-14
 
 commands:
     npm-install:
@@ -47,34 +42,17 @@ references:
             ignore: /.*/
 
 jobs:
-    build-node-8:
-        executor: circleci-node-8
+    build-node-14:
+        executor: container_config_node14
         steps:
             - checkout
             - npm-install
             - persist_to_workspace:
                   root: *workspace_root
                   paths:
-                      - build-node-8
-    build-node-10:
-        executor: circleci-node-10
-        steps:
-            - checkout
-            - npm-install
-            - persist_to_workspace:
-                  root: *workspace_root
-                  paths:
-                      - build-node-10
-
-    test-node-8:
-        executor: circleci-node-8
-        steps:
-            - *attach_workspace
-            - run:
-                  name: Run tests
-                  command: npm test
-    test-node-10:
-        executor: circleci-node-10
+                      - build-node-14
+    test-node-14:
+        executor: container_config_node14
         steps:
             - *attach_workspace
             - run:
@@ -82,7 +60,7 @@ jobs:
                   command: npm test
 
     publish:
-        executor: circleci-node-10
+        executor: container_config_node14
         steps:
             - *attach_workspace
             - run:
@@ -109,44 +87,27 @@ workflows:
 
     build-test:
         jobs:
-            - build-node-8:
+            - build-node-14:
                   filters:
                       <<: *filters_branch_build
-            - build-node-10:
-                  filters:
-                      <<: *filters_branch_build
-            - test-node-8:
+            - test-node-14:
                   filters:
                       <<: *filters_branch_build
                   requires:
-                      - build-node-8
-            - test-node-10:
-                  filters:
-                      <<: *filters_branch_build
-                  requires:
-                      - build-node-10
+                      - build-node-14
 
     build-test-publish:
         jobs:
-            - build-node-8:
+            - build-node-14:
                   filters:
                       <<: *filters_release_package_build
-            - build-node-10:
-                  filters:
-                      <<: *filters_release_package_build
-            - test-node-8:
+            - test-node-14:
                   filters:
                       <<: *filters_release_package_build
                   requires:
-                      - build-node-8
-            - test-node-10:
-                  filters:
-                      <<: *filters_release_package_build
-                  requires:
-                      - build-node-10
+                      - build-node-14
             - publish:
                   filters:
                       <<: *filters_release_package_build
                   requires:
-                      - test-node-8
-                      - test-node-10
+                      - test-node-14

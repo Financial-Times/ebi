@@ -48,7 +48,7 @@
 		"@octokit/rest": "^16.15.0",
 		"lodash": "^4.17.11",
 		"nock": "^11.0.0",
-		"update-notifier": "^4.0.0",
+		"update-notifier": "^5.0.0",
 		"yargs": "^14.0.0"
 	},
 	"devDependencies": {

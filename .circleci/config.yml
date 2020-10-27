@@ -1,10 +1,10 @@
 version: 2.1
 
 executors:
-    circleci-node-12:
+    circleci-node:
         docker:
             - image: circleci/node:12
-        working_directory: ~/project/build-node-12
+        working_directory: ~/project/build-node
 
 commands:
     npm-install:
@@ -42,17 +42,17 @@ references:
             ignore: /.*/
 
 jobs:
-    build-node-12:
-        executor: circleci-node-12
+    build-node:
+        executor: circleci-node
         steps:
             - checkout
             - npm-install
             - persist_to_workspace:
                   root: *workspace_root
                   paths:
-                      - build-node-12
-    test-node-12:
-        executor: circleci-node-12
+                      - build-node
+    test-node:
+        executor: circleci-node
         steps:
             - *attach_workspace
             - run:
@@ -60,7 +60,7 @@ jobs:
                   command: npm test
 
     publish:
-        executor: circleci-node-12
+        executor: circleci-node
         steps:
             - *attach_workspace
             - run:
@@ -87,27 +87,27 @@ workflows:
 
     build-test:
         jobs:
-            - build-node-12:
+            - build-node:
                   filters:
                       <<: *filters_branch_build
-            - test-node-12:
+            - test-node:
                   filters:
                       <<: *filters_branch_build
                   requires:
-                      - build-node-12
+                      - build-node
 
     build-test-publish:
         jobs:
-            - build-node-12:
+            - build-node:
                   filters:
                       <<: *filters_release_package_build
-            - test-node-12:
+            - test-node:
                   filters:
                       <<: *filters_release_package_build
                   requires:
-                      - build-node-12
+                      - build-node
             - publish:
                   filters:
                       <<: *filters_release_package_build
                   requires:
-                      - test-node-12
+                      - test-node

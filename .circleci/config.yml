@@ -29,9 +29,15 @@ references:
     # Filters
     #
 
-    filters_branch_build: &filters_branch_build
+    filters_only_renovate_nori: &filters_only_renovate_nori
+        branches:
+            only: /(^renovate-.*|^nori\/.*)/
+
+    filters_branch_build_renovate_nori: &filters_branch_build_renovate_nori
         tags:
             ignore: /.*/
+        branches:
+            ignore: /(^renovate-.*|^nori\/.*)/
 
     filters_release_package_build: &filters_release_package_build
         tags:
@@ -89,10 +95,21 @@ workflows:
         jobs:
             - build-node:
                   filters:
-                      <<: *filters_branch_build
+                      <<: *filters_branch_build_renovate_nori
             - test-node:
+                  requires:
+                      - build-node
+
+    renovate-nori-build-test:
+        jobs:
+            - waiting-for-approval:
+                  type: approval
                   filters:
-                      <<: *filters_branch_build
+                      <<: *filters_only_renovate_nori
+            - build-node:
+                  requires:
+                      - waiting-for-approval
+            - test-node:
                   requires:
                       - build-node
 

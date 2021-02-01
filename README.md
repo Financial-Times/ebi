@@ -1,7 +1,7 @@
 # 🦐 Ebi: GitHub repositories contents search
 
-<a href="https://circleci.com/gh/Financial-Times/ebi/tree/master">
-	<img alt="Build Status" src="https://circleci.com/gh/Financial-Times/ebi/tree/master.svg?style=svg">
+<a href="https://circleci.com/gh/Financial-Times/ebi/tree/main">
+	<img alt="Build Status" src="https://circleci.com/gh/Financial-Times/ebi/tree/main.svg?style=svg">
 </a>
 
 Searches files within GitHub repositories. It can be used as a command line tool or a library.

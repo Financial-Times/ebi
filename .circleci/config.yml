@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  node: circleci/node@4.6.0
+
 executors:
     circleci-node:
         docker:
@@ -52,6 +55,8 @@ jobs:
         executor: circleci-node
         steps:
             - checkout
+            - node/install-npm:
+                version: "7"
             - npm-install
             - persist_to_workspace:
                   root: *workspace_root

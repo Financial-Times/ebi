@@ -11,7 +11,7 @@
     "test": "npm run lint && npm run unit-test",
     "unit-test": "jest",
     "unit-test:watch": "jest --watch",
-    "preinstall": "[[ \"$INIT_CWD\" != \"$PWD\" ]] || npm_config_yes=true npx check-engine"
+    "preinstall": "[ \"$INIT_CWD\" != \"$PWD\" ] || npm_config_yes=true npx check-engine"
   },
   "repository": {
     "type": "git",

@@ -38,7 +38,7 @@
   "homepage": "https://github.com/Financial-Times/ebi#readme",
   "engines": {
     "node": "12.x",
-    "npm": "7.x"
+    "npm": "7.x || 8.x"
   },
   "husky": {
     "hooks": {

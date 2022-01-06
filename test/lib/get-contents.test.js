@@ -20,14 +20,14 @@ describe('getContents', () => {
 		const filepath = 'Procfile';
 		nockScope.get(`/${repo}/contents/${filepath}`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 		const getPathContents = getContents({
 			filepath,
 			githubToken: '123'
 		});
-		expect(await getPathContents(repo)).toContain('web: n-cluster');
+		expect(await getPathContents(repo)).toContain('web: node --max-http-header-size=80000 server/cluster.js');
 	});
 
 	test('when repository not found correct error is thrown', async () => {

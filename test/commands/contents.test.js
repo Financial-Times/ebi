@@ -163,7 +163,7 @@ describe('contents command handler', () => {
 	test('when contents handler is called with valid <file> and <search> values, a list of repositories are logged', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -179,7 +179,7 @@ describe('contents command handler', () => {
 	test('when contents handler is called with valid <file> and <search> and <repo list> values, a list of repositories are logged', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -210,7 +210,7 @@ describe('contents command handler', () => {
 	test('empty `contents` search, logs existence of file', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -254,7 +254,7 @@ describe('contents command handler', () => {
 	test('<search> value not found, does not log (with verbose flag)', async () => {
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -472,7 +472,7 @@ describe.each([
 		repos.forEach(repo => {
 			nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 				type: 'file',
-				content: base64Encode('web: n-cluster server/init.js'),
+				content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 				path: 'Procfile'
 			});
 		});

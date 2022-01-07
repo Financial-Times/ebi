@@ -37,7 +37,7 @@ describe('contentsSearch resultsAsync', () => {
 		const repo = 'Financial-Times/ebi';
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -50,7 +50,7 @@ describe('contentsSearch resultsAsync', () => {
 
 		await expect(result).resolves.toEqual({
 			filepath: 'Procfile',
-			fileContents: 'web: n-cluster server/init.js',
+			fileContents: 'web: node --max-http-header-size=80000 server/cluster.js',
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'web:',
@@ -62,7 +62,7 @@ describe('contentsSearch resultsAsync', () => {
 		const repo = 'Financial-Times/ebi';
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -75,7 +75,7 @@ describe('contentsSearch resultsAsync', () => {
 
 		await expect(result).resolves.toEqual({
 			filepath: 'Procfile',
-			fileContents: 'web: n-cluster server/init.js',
+			fileContents: 'web: node --max-http-header-size=80000 server/cluster.js',
 			regex: 'w..:',
 			repository: 'Financial-Times/ebi',
 			search: undefined,
@@ -87,7 +87,7 @@ describe('contentsSearch resultsAsync', () => {
 		const repo = 'Financial-Times/ebi';
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -101,7 +101,7 @@ describe('contentsSearch resultsAsync', () => {
 
 		await expect(result).resolves.toEqual({
 			filepath: 'Procfile',
-			fileContents: 'web: n-cluster server/init.js',
+			fileContents: 'web: node --max-http-header-size=80000 server/cluster.js',
 			regex: 'w..:',
 			repository: 'Financial-Times/ebi',
 			search: 'nope',
@@ -113,12 +113,12 @@ describe('contentsSearch resultsAsync', () => {
 		const repo = 'Financial-Times/ebi';
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
 		const ebiSearch = contentsSearch({
-			search: 'node',
+			search: 'worker',
 			filepath: 'Procfile'
 		});
 		const { resultsAsync } = await ebiSearch([repo]);
@@ -126,12 +126,12 @@ describe('contentsSearch resultsAsync', () => {
 
 		await expect(result).resolves.toEqual({
 			message:
-				"INFO: 'Procfile' has no match for 'node' in 'Financial-Times/ebi'",
+				"INFO: 'Procfile' has no match for 'worker' in 'Financial-Times/ebi'",
 			filepath: 'Procfile',
-			fileContents: 'web: n-cluster server/init.js',
+			fileContents: 'web: node --max-http-header-size=80000 server/cluster.js',
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
-			search: 'node',
+			search: 'worker',
 			type: RESULT_TYPES.noMatch
 		});
 	});
@@ -164,7 +164,7 @@ describe('contentsSearch getResults', () => {
 		const repo = 'Financial-Times/ebi';
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -182,7 +182,7 @@ describe('contentsSearch getResults', () => {
 
 		const expectedResult = {
 			filepath: 'Procfile',
-			fileContents: 'web: n-cluster server/init.js',
+			fileContents: 'web: node --max-http-header-size=80000 server/cluster.js',
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			search: 'web:',
@@ -199,7 +199,7 @@ describe('contentsSearch getResults', () => {
 		const repo = 'Financial-Times/ebi';
 		nockScope.get(`/${repo}/contents/Procfile`).reply(200, {
 			type: 'file',
-			content: base64Encode('web: n-cluster server/init.js'),
+			content: base64Encode('web: node --max-http-header-size=80000 server/cluster.js'),
 			path: 'Procfile'
 		});
 
@@ -217,7 +217,7 @@ describe('contentsSearch getResults', () => {
 
 		const expectedResult = {
 			filepath: 'Procfile',
-			fileContents: 'web: n-cluster server/init.js',
+			fileContents: 'web: node --max-http-header-size=80000 server/cluster.js',
 			regex: undefined,
 			repository: 'Financial-Times/ebi',
 			message:

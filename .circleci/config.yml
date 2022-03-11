@@ -4,132 +4,135 @@ orbs:
   node: circleci/node@4.6.0
 
 executors:
-    circleci-node:
-        docker:
-            - image: cimg/node:12.22
-        working_directory: ~/project/build-node
+  circleci-node:
+    docker:
+      - image: cimg/node:12.22
+    working_directory: ~/project/build-node
 
 commands:
-    npm-install:
-        description: 'npm install without generating a package-lock file'
-        steps:
-            - run:
-                  name: 'Install project dependencies'
-                  command: npm install --no-package-lock
+  npm-install:
+    description: 'npm install without generating a package-lock file'
+    steps:
+      - run:
+          name: 'Install project dependencies'
+          command: npm install --no-package-lock
 
 references:
-    #
-    # Workspace
-    #
+  #
+  # Workspace
+  #
+  workspace_root: &workspace_root ~/project
 
-    workspace_root: &workspace_root ~/project
+  attach_workspace:
+    &attach_workspace
+    attach_workspace:
+      at: *workspace_root
 
-    attach_workspace: &attach_workspace
-        attach_workspace:
-            at: *workspace_root
+  # Filters
+  #
+  filters_only_renovate_nori:
+    &filters_only_renovate_nori
+    branches:
+      only: /(^renovate-.*|^nori\/.*)/
 
-    #
-    # Filters
-    #
+  filters_branch_build_renovate_nori:
+    &filters_branch_build_renovate_nori
+    tags:
+      ignore: /.*/
+    branches:
+      ignore: /(^renovate-.*|^nori\/.*)/
 
-    filters_only_renovate_nori: &filters_only_renovate_nori
-        branches:
-            only: /(^renovate-.*|^nori\/.*)/
+  filters_release_package_build:
+    &filters_release_package_build
+    tags:
+      only:
+        - /^v\d+\.\d+\.\d+(\-\w+\.\d+)?$/
 
-    filters_branch_build_renovate_nori: &filters_branch_build_renovate_nori
-        tags:
-            ignore: /.*/
-        branches:
-            ignore: /(^renovate-.*|^nori\/.*)/
-
-    filters_release_package_build: &filters_release_package_build
-        tags:
-            only:
-                - /^v\d+\.\d+\.\d+(\-\w+\.\d+)?$/
-
-        branches:
-            ignore: /.*/
+    branches:
+      ignore: /.*/
 
 jobs:
-    build-node:
-        executor: circleci-node
-        steps:
-            - checkout
-            - node/install-npm:
-                version: "7"
-            - npm-install
-            - persist_to_workspace:
-                  root: *workspace_root
-                  paths:
-                      - build-node
-    test-node:
-        executor: circleci-node
-        steps:
-            - *attach_workspace
-            - run:
-                  name: Run tests
-                  command: npm test
+  build-node:
+    executor: circleci-node
+    steps:
+      - checkout
+      - node/install-npm:
+          version: "7"
+      - npm-install
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - build-node
+  test-node:
+    executor: circleci-node
+    steps:
+      - *attach_workspace
+      - run:
+          name: Run tests
+          command: npm test
 
-    publish:
-        executor: circleci-node
-        steps:
-            - *attach_workspace
-            - run:
-                  name: Configure registry.npmjs.org auth token
-                  command: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ${HOME}/.npmrc
-            - run:
-                  name: Extract package name and semver from git tag
-                  command: |
-                      # https://circleci.com/docs/2.0/env-vars/#using-bash_env-to-set-environment-variables
-                      export RELEASE_SEMVER='v[0-9]{1,3}\.[0-9]{1,2}\.[0-9]{1,2}(-[a-z]+\.[0-9])?';
-                      export TARGET_VERSION=$(echo $CIRCLE_TAG | grep -o -E $RELEASE_SEMVER);
-                      echo "export TARGET_VERSION=$TARGET_VERSION" >> $BASH_ENV;
-                      echo "Creating release ${TARGET_VERSION}";
-            - run:
-                  name: Bump package version
-                  command: npm version --no-git-tag-version ${TARGET_VERSION}
+  publish:
+    executor: circleci-node
+    steps:
+      - *attach_workspace
+      - run:
+          name: Configure registry.npmjs.org auth token
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >
+            ${HOME}/.npmrc
+      - run:
+          name: Extract package name and semver from git tag
+          command: |
+            # https://circleci.com/docs/2.0/env-vars/#using-bash_env-to-set-environment-variables
+            export RELEASE_SEMVER='v[0-9]{1,3}\.[0-9]{1,2}\.[0-9]{1,2}(-[a-z]+\.[0-9])?';
+            export TARGET_VERSION=$(echo $CIRCLE_TAG | grep -o -E $RELEASE_SEMVER);
+            echo "export TARGET_VERSION=$TARGET_VERSION" >> $BASH_ENV;
+            echo "Creating release ${TARGET_VERSION}";
+      - run:
+          name: Bump package version
+          command: npm version --no-git-tag-version ${TARGET_VERSION}
 
-            - run:
-                  name: Publish package to npm
-                  command: npm publish --access public
+      - run:
+          name: Publish package to npm
+          command: npm publish --access public
 
 workflows:
-    version: 2
+  version: 2
 
-    build-test:
-        jobs:
-            - build-node:
-                  filters:
-                      <<: *filters_branch_build_renovate_nori
-            - test-node:
-                  requires:
-                      - build-node
+  build-test:
+    jobs:
+      - build-node:
+          filters:
+            <<: *filters_branch_build_renovate_nori
+      - test-node:
+          requires:
+            - build-node
 
-    renovate-nori-build-test:
-        jobs:
-            - waiting-for-approval:
-                  type: approval
-                  filters:
-                      <<: *filters_only_renovate_nori
-            - build-node:
-                  requires:
-                      - waiting-for-approval
-            - test-node:
-                  requires:
-                      - build-node
+  renovate-nori-build-test:
+    jobs:
+      - waiting-for-approval:
+          type: approval
+          filters:
+            <<: *filters_only_renovate_nori
+      - build-node:
+          requires:
+            - waiting-for-approval
+      - test-node:
+          requires:
+            - build-node
 
-    build-test-publish:
-        jobs:
-            - build-node:
-                  filters:
-                      <<: *filters_release_package_build
-            - test-node:
-                  filters:
-                      <<: *filters_release_package_build
-                  requires:
-                      - build-node
-            - publish:
-                  filters:
-                      <<: *filters_release_package_build
-                  requires:
-                      - test-node
+  build-test-publish:
+    jobs:
+      - build-node:
+          filters:
+            <<: *filters_release_package_build
+      - test-node:
+          filters:
+            <<: *filters_release_package_build
+          requires:
+            - build-node
+      - publish:
+          context: npm-publish-token
+          filters:
+            <<: *filters_release_package_build
+          requires:
+            - test-node

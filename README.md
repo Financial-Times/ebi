@@ -33,6 +33,8 @@ The npx command lets you use this tool without installing it. However, each time
 2.  Pass in the list of space-separated repositories as arguments:
 
         ebi <command> Financial-Times/ebi Financial-Times/tako
+        
+3. If ebi is silently failing you can turn on `--verbose` to see more logging
 
 ### Examples
 

@@ -231,3 +231,4 @@ CircleCI is set up to publish a release to `npm`. To release:
     2. Create a title and description
     3. Publish release
 2. Wait for CircleCI to finish building the tag release, and once done, it will be appear at [npmjs.com/package/ebi](https://www.npmjs.com/package/ebi)
+test

@@ -64,3 +64,4 @@ typings/
 
 # Temporary files folder
 tmp
+.git/

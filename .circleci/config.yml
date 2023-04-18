@@ -125,14 +125,14 @@ workflows:
           name: build-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14", "14.19" ]
+              node-version: [ "16.14" ]
       - test-node:
           requires:
             - build-node-v<< matrix.node-version >>
           name: test-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14", "14.19" ]
+              node-version: [ "16.14" ]
 
   renovate-nori-build-test:
     jobs:
@@ -146,14 +146,14 @@ workflows:
           name: build-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14", "14.19" ]
+              node-version: [ "16.14" ]
       - test-node:
           requires:
             - build-node-v<< matrix.node-version >>
           name: test-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14", "14.19" ]
+              node-version: [ "16.14" ]
 
   build-test-publish:
     jobs:
@@ -163,7 +163,7 @@ workflows:
           name: build-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14", "14.19" ]
+              node-version: [ "16.14" ]
       - test-node:
           filters:
             <<: *filters_release_package_build
@@ -172,7 +172,7 @@ workflows:
           name: test-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14", "14.19" ]
+              node-version: [ "16.14" ]
       - publish:
           context: npm-publish-token
           filters:

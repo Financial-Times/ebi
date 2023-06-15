@@ -10,7 +10,7 @@ executors:
     working_directory: ~/project/build-node
     parameters:
       node-version:
-        default: "16.14"
+        default: "18.16"
         type: string
 
 commands:
@@ -28,8 +28,7 @@ references:
 
   workspace_root: &workspace_root ~/project
 
-  attach_workspace:
-    &attach_workspace
+  attach_workspace: &attach_workspace
     attach_workspace:
       at: *workspace_root
 
@@ -37,20 +36,17 @@ references:
   # Filters
   #
 
-  filters_only_renovate_nori:
-    &filters_only_renovate_nori
+  filters_only_renovate_nori: &filters_only_renovate_nori
     branches:
       only: /(^renovate-.*|^nori\/.*)/
 
-  filters_branch_build_renovate_nori:
-    &filters_branch_build_renovate_nori
+  filters_branch_build_renovate_nori: &filters_branch_build_renovate_nori
     tags:
       ignore: /.*/
     branches:
       ignore: /(^renovate-.*|^nori\/.*)/
 
-  filters_release_package_build:
-    &filters_release_package_build
+  filters_release_package_build: &filters_release_package_build
     tags:
       only:
         - /^v\d+\.\d+\.\d+(\-\w+\.\d+)?$/
@@ -62,13 +58,9 @@ jobs:
   build-node:
     executor: circleci-node
     parameters:
-      node-version:
-        default: "16.14"
-        type: string
+      node-version: [ "16.20", "18.16" ]
     steps:
       - checkout
-      - node/install-npm:
-          version: "7"
       - npm-install
       - persist_to_workspace:
           root: *workspace_root
@@ -77,9 +69,7 @@ jobs:
   test-node:
     executor: circleci-node
     parameters:
-      node-version:
-        default: "16.14"
-        type: string
+      node-version: [ "16.20", "18.16" ]
     steps:
       - *attach_workspace
       - run:
@@ -89,9 +79,7 @@ jobs:
   publish:
     executor: circleci-node
     parameters:
-      node-version:
-        default: "16.14"
-        type: string
+      node-version: [ "16.20", "18.16" ]
     steps:
       - *attach_workspace
       - run:
@@ -125,14 +113,14 @@ workflows:
           name: build-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14" ]
+              node-version: [ "16.20", "18.16" ]
       - test-node:
           requires:
             - build-node-v<< matrix.node-version >>
           name: test-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14" ]
+              node-version: [ "16.20", "18.16" ]
 
   renovate-nori-build-test:
     jobs:
@@ -146,14 +134,14 @@ workflows:
           name: build-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14" ]
+              node-version: [ "16.20", "18.16" ]
       - test-node:
           requires:
             - build-node-v<< matrix.node-version >>
           name: test-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14" ]
+              node-version: [ "16.20", "18.16" ]
 
   build-test-publish:
     jobs:
@@ -163,7 +151,7 @@ workflows:
           name: build-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14" ]
+              node-version: [ "16.20", "18.16" ]
       - test-node:
           filters:
             <<: *filters_release_package_build
@@ -172,10 +160,10 @@ workflows:
           name: test-node-v<< matrix.node-version >>
           matrix:
             parameters:
-              node-version: [ "16.14" ]
+              node-version: [ "16.20", "18.16" ]
       - publish:
           context: npm-publish-token
           filters:
             <<: *filters_release_package_build
           requires:
-            - test-node-v16.14
+            - test-node-v18.16

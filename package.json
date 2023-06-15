@@ -10,8 +10,7 @@
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "test": "npm run lint && npm run unit-test",
     "unit-test": "jest",
-    "unit-test:watch": "jest --watch",
-    "preinstall": "[ \"$INIT_CWD\" != \"$PWD\" ] || npm_config_yes=true npx check-engine"
+    "unit-test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -37,8 +36,8 @@
   },
   "homepage": "https://github.com/Financial-Times/ebi#readme",
   "engines": {
-    "node": "16.x",
-    "npm": "7.x || 8.x"
+    "node": "16.x || 18.x",
+    "npm": "7.x || 8.x || 9.x"
   },
   "husky": {
     "hooks": {
@@ -63,7 +62,6 @@
     "prettier": "1.17.0"
   },
   "volta": {
-    "node": "16.14.1",
-    "npm": "7.20.2"
+    "node": "18.16.0"
   }
 }
